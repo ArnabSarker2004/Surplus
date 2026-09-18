@@ -1,0 +1,186 @@
+.bank-panel {
+  border: 1px solid #dce4d7;
+  border-radius: 16px;
+  padding: 26px;
+  background: #fafbf7;
+  margin: 22px 0;
+}
+.bank-panel-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.bank-panel-heading > div {
+  flex: 1;
+  min-width: 180px;
+}
+.bank-panel h3 {
+  font-size: 19px;
+  margin: 0 0 7px;
+}
+.bank-panel p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #536458;
+}
+.bank-symbol {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  color: #34583e;
+  background: #e6eddc;
+}
+.bank-benefits {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+  font-size: 12px;
+  color: #465e4b;
+}
+.bank-panel .field-note {
+  margin-top: 14px;
+  font-size: 12px;
+}
+.bank-test-options {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #dce4d7;
+}
+.bank-test-options summary {
+  cursor: pointer;
+  font-size: 13px;
+}
+.bank-test-options p {
+  margin: 14px 0;
+}
+.bank-connected {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+  background: #e8efdf;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+.bank-connected strong {
+  font-size: 14px;
+}
+.bank-account-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 15px 0;
+  border-bottom: 1px solid #dce4d7;
+  font-size: 13px;
+}
+.bank-account-list small {
+  display: block;
+  margin-top: 5px;
+  color: #536458;
+}
+.bank-account-list {
+  margin-bottom: 20px;
+}
+.bank-privacy {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 23px;
+  font-size: 11px !important;
+}
+.bank-privacy svg {
+  margin-top: 3px;
+}
+.setup-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.setup-shortcuts button {
+  border: 1px solid #cbd7c3;
+  border-radius: 25px;
+  padding: 8px 14px;
+  font-size: 12px;
+  background: #f6f8f1;
+}
+.setup-choice-custom {
+  margin-top: 10px;
+}
+@media (max-width: 600px) {
+  .bank-panel {
+    padding: 18px;
+  }
+  .bank-panel .button-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .bank-panel .button {
+    white-space: normal;
+  }
+}
+
+.bank-benefits {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+}
+.bank-benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.bank-benefits li > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #e5eddc;
+  color: #35543b;
+  font-weight: 600;
+}
+.bank-benefits strong,
+.bank-benefits small {
+  display: block;
+}
+.bank-benefits strong {
+  margin: 2px 0 5px;
+  font-size: 14px;
+}
+.bank-benefits small {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #536458;
+}
+.bank-card-note {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #edf1e6;
+}
+.bank-insight-preview {
+  padding: 20px 24px;
+  border-left: 3px solid #87a27c;
+}
+.bank-insight-preview h3 {
+  font-size: 20px;
+  margin: 12px 0;
+}
+.bank-insight-preview ul {
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.bank-insight-preview p {
+  font-size: 12px;
+  color: #596653;
+  margin-top: 12px;
+  line-height: 1.7;
+}

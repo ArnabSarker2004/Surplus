@@ -1,0 +1,126 @@
+.demo-workspace {
+  min-height: 100vh;
+  background: #f6f7f1;
+}
+.demo-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px max(20px, calc((100vw - 1280px) / 2));
+  background: #fffefb;
+  border-bottom: 1px solid #dfe5d8;
+  flex-wrap: wrap;
+}
+.demo-header > div:nth-child(2) {
+  flex: 1;
+}
+.demo-header > div:nth-child(2) strong,
+.demo-header > div:nth-child(2) span {
+  display: block;
+}
+.demo-header > div:nth-child(2) > span {
+  font-size: 12px;
+  color: #596653;
+  margin-top: 5px;
+}
+.demo-header .button.primary,
+.demo-header a.button:not(.ghost),
+.demo-bank-preview a.button {
+  background: #284f3e;
+  color: #fff;
+}
+.demo-notice {
+  max-width: 1280px;
+  margin: 24px auto 12px;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: #e7eddc;
+  border-radius: 12px;
+}
+.demo-notice p {
+  color: #46543d;
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0;
+}
+.demo-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 1280px;
+  margin: auto;
+  padding: 12px 0;
+}
+.demo-navigation button {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.demo-navigation [aria-current='page'] {
+  background: #284f3e;
+  color: white;
+}
+.demo-content {
+  max-width: 1280px;
+  margin: auto;
+  padding: 30px 0 70px;
+}
+.demo-feedback {
+  max-width: 1280px;
+  margin: 10px auto;
+  padding: 14px 20px;
+  background: #fff;
+  border: 1px solid #dce4d4;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.demo-bank-preview {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.demo-bank-preview h1 {
+  font-family: var(--serif);
+  font-size: clamp(32px, 5vw, 48px);
+}
+.demo-bank-preview p,
+.demo-bank-preview li {
+  line-height: 1.8;
+  margin: 14px 0;
+}
+.demo-bank-preview ol {
+  padding-left: 24px;
+}
+@media (max-width: 1320px) {
+  .demo-notice,
+  .demo-navigation,
+  .demo-content,
+  .demo-feedback {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}
+@media (max-width: 600px) {
+  .demo-header {
+    gap: 14px;
+    padding: 20px;
+  }
+  .demo-header > div:nth-child(2) {
+    min-width: 170px;
+  }
+  .demo-notice {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .demo-content {
+    padding-top: 18px;
+  }
+  .demo-navigation button {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}

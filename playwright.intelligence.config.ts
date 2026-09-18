@@ -1,0 +1,55 @@
+import { defineConfig, devices } from '@playwright/test';
+const token = 'browser-tests-only-intelligence-service-key';
+const serviceUrl = 'http://127.0.0.1:8002';
+export default defineConfig({
+  testDir: './tests/intelligence-browser',
+  workers: 1,
+  timeout: 90_000,
+  expect: { timeout: 30_000 },
+  reporter: 'list',
+  outputDir: 'artifacts/intelligence-browser-results',
+  use: {
+    ...devices['Desktop Chrome'],
+    viewport: { width: 1440, height: 1000 },
+    baseURL: 'http://127.0.0.1:3004',
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+  },
+  webServer: [
+    {
+      command: 'npm run intelligence:dev',
+      url: serviceUrl + '/health',
+      timeout: 45_000,
+      reuseExistingServer: false,
+      env: { INTELLIGENCE_SERVICE_TOKEN: token, INTELLIGENCE_SERVICE_URL: serviceUrl },
+    },
+    {
+      command: 'npm run start',
+      url: 'http://127.0.0.1:3004/api/health',
+      timeout: 30_000,
+      reuseExistingServer: false,
+      env: {
+        PORT: '3004',
+        DATABASE_URL: '',
+        SURPLUS_DATA_DIR: 'data/intelligence-browser',
+        INTELLIGENCE_SERVICE_TOKEN: token,
+        INTELLIGENCE_SERVICE_URL: serviceUrl,
+        AUTH_PUBLIC_ORIGIN: 'http://127.0.0.1:3004',
+        PLAID_CLIENT_ID: '',
+        PLAID_SANDBOX_SECRET: '',
+        PLAID_PRODUCTION_SECRET: '',
+        PLAID_SANDBOX_ACCESS_TOKEN: '',
+        TOKEN_ENCRYPTION_KEY: '',
+        GOOGLE_CLIENT_ID: '',
+        GOOGLE_CLIENT_SECRET: '',
+        MICROSOFT_CLIENT_ID: '',
+        MICROSOFT_CLIENT_SECRET: '',
+        SMTP_HOST: '',
+        SMTP_USER: '',
+        SMTP_PASSWORD: '',
+        SMTP_FROM: '',
+        JWT_SIGNING_KEY: '',
+      },
+    },
+  ],
+});

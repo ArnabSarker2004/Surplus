@@ -1,0 +1,28 @@
+"""Small, reviewed Canadian catalogue. No affiliate links or introductory offers."""
+REVIEWED = "2026-09-18"
+CARDS = [
+    dict(id="tangerine", name="Tangerine Money-Back Mastercard", kind="Cash back", network="Mastercard", annualFee=0,
+         url="https://www.tangerine.ca/en/personal/spend/credit-cards/money-back-credit-card",
+         terms="2% in two selected categories; 0.5% elsewhere. A third category requires rewards deposited into Tangerine Savings.",
+         benefits=["Choose categories to match your spending", "Monthly rewards payout"],
+         eligibility="Issuer checks income, residency, age and credit. Published minimum gross annual income: $12,000. Confirm residency requirements with Tangerine.",
+         sources=["https://www.tangerine.ca/en/personal/spend/credit-cards/money-back-credit-card"]),
+    dict(id="bmo", name="BMO CashBack Mastercard", kind="Cash back", network="Mastercard", annualFee=0,
+         url="https://www.bmo.com/main/personal/credit-cards/bmo-cashback-mastercard/",
+         terms="3% on the first $500 of groceries per statement; 1% on the first $500 of recurring bills; 0.5% otherwise.",
+         benefits=["Grocery bonus without an annual fee", "Cash-back redemption starts at $1"],
+         eligibility="Canadian residency, age and credit approval requirements apply. Student eligibility is assessed by BMO.",
+         sources=["https://www.bmo.com/main/personal/credit-cards/bmo-cashback-mastercard/"]),
+    dict(id="simplii", name="Simplii Cash Back Visa", kind="Cash back", network="Visa", annualFee=0,
+         url="https://www.simplii.com/en/credit-cards/cash-back-visa.html",
+         terms="4% on the first $5,000/year at restaurants; 1.5% on the first combined $15,000/year of gas, groceries, drugstores and pre-authorized bills; 0.5% otherwise.",
+         benefits=["Dining-focused rewards", "Automatic annual cash-back redemption"],
+         eligibility="Published minimum household income: $15,000. Canadian citizens/permanent residents outside Quebec, age of majority and credit approval required.",
+         sources=["https://www.simplii.com/en/credit-cards/cash-back-visa.html", "https://www.simplii.com/content/dam/simplii-public-assets/documents/pdf/credit-cards/cash-back-visa-benefits-guide.pdf"]),
+    dict(id="cobalt", name="American Express Cobalt", kind="Points", network="American Express", annualFee=191.88,
+         url="https://www.americanexpress.com/en-ca/credit-cards/cobalt-card/",
+         terms="5 points/$ on eligible Canadian food purchases up to $2,500/month, then 1; 2 on gas/transit; 1 otherwise. Eligible streaming earns 3 but is conservatively modeled at 1.",
+         benefits=["Flexible Membership Rewards redemptions", "Food and local transport earn bonuses"],
+         eligibility="Age, Canadian residency and credit approval requirements apply. Check acceptance at your usual stores. Fee is $15.99/month outside Quebec, $191.88/year in Quebec.",
+         sources=["https://www.americanexpress.com/ca/en/benefits/cobalt-card/", "https://www.americanexpress.com/en-ca/benefits/upgrade/cobalt-to-gold-card/", "https://www.americanexpress.com/ca/en/benefits/membership-benefits/pay-with-points.html"]),
+]

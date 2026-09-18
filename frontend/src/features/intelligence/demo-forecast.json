@@ -1,0 +1,2266 @@
+{
+  "version": "surplus-forecast-1.0",
+  "asOf": "2026-09-16",
+  "source": "demo",
+  "horizonDays": 180,
+  "syncedAt": null,
+  "quality": {
+    "historyDays": 259,
+    "completeWeeks": 36,
+    "transactionCount": 363,
+    "excludedCount": 35,
+    "cashKnown": true,
+    "level": "established",
+    "warnings": [
+      "Pending outflows are reserved once at the start, not used for training. Verify the bank has not already included them in its current balance."
+    ]
+  },
+  "summary": {
+    "cash": 6075.4,
+    "creditReserve": 285.6,
+    "pendingReserve": 48.5,
+    "goalReserve": 630,
+    "buffer": 250,
+    "startingUsableCash": 5741.3,
+    "incomeNext30": 880,
+    "spendingNext30": 6791.81,
+    "netNext30": -5911.81,
+    "endingMedian": -1556.52,
+    "scenarioEndingMedian": -1556.52,
+    "bufferBreachDate": "2026-09-25",
+    "bufferBreachRate": 100,
+    "safeWeeklyRoom": 0
+  },
+  "timeline": [
+    {
+      "date": "2026-09-16",
+      "low": 5741.3,
+      "median": 5741.3,
+      "high": 5741.3,
+      "scenario": 5741.3,
+      "netChange": 0
+    },
+    {
+      "date": "2026-09-17",
+      "low": 5685.05,
+      "median": 5735.05,
+      "high": 5735.05,
+      "scenario": 5735.05,
+      "netChange": -6.25
+    },
+    {
+      "date": "2026-09-18",
+      "low": 5603.8,
+      "median": 5703.8,
+      "high": 5703.8,
+      "scenario": 5703.8,
+      "netChange": -37.5
+    },
+    {
+      "date": "2026-09-19",
+      "low": 5547.55,
+      "median": 5697.55,
+      "high": 5697.55,
+      "scenario": 5697.55,
+      "netChange": -43.75
+    },
+    {
+      "date": "2026-09-20",
+      "low": 5491.3,
+      "median": 5691.3,
+      "high": 5691.3,
+      "scenario": 5691.3,
+      "netChange": -50
+    },
+    {
+      "date": "2026-09-21",
+      "low": 5435.05,
+      "median": 5685.05,
+      "high": 5685.05,
+      "scenario": 5685.05,
+      "netChange": -56.25
+    },
+    {
+      "date": "2026-09-22",
+      "low": 5378.8,
+      "median": 5678.8,
+      "high": 5678.8,
+      "scenario": 5678.8,
+      "netChange": -62.5
+    },
+    {
+      "date": "2026-09-23",
+      "low": 5322.55,
+      "median": 5672.55,
+      "high": 5672.55,
+      "scenario": 5672.55,
+      "netChange": -68.75
+    },
+    {
+      "date": "2026-09-24",
+      "low": 5312.68,
+      "median": 5643.8,
+      "high": 5666.3,
+      "scenario": 5643.8,
+      "netChange": -97.5
+    },
+    {
+      "date": "2026-09-25",
+      "low": 72.82,
+      "median": 407.55,
+      "high": 430.05,
+      "scenario": 407.55,
+      "netChange": -5333.75
+    },
+    {
+      "date": "2026-09-26",
+      "low": 62.95,
+      "median": 401.3,
+      "high": 423.8,
+      "scenario": 401.3,
+      "netChange": -5340
+    },
+    {
+      "date": "2026-09-27",
+      "low": 53.09,
+      "median": 395.05,
+      "high": 417.55,
+      "scenario": 395.05,
+      "netChange": -5346.25
+    },
+    {
+      "date": "2026-09-28",
+      "low": 43.22,
+      "median": 388.8,
+      "high": 411.3,
+      "scenario": 388.8,
+      "netChange": -5352.5
+    },
+    {
+      "date": "2026-09-29",
+      "low": 33.35,
+      "median": 382.55,
+      "high": 405.05,
+      "scenario": 382.55,
+      "netChange": -5358.75
+    },
+    {
+      "date": "2026-09-30",
+      "low": 23.49,
+      "median": 376.3,
+      "high": 398.8,
+      "scenario": 376.3,
+      "netChange": -5365
+    },
+    {
+      "date": "2026-10-01",
+      "low": -716.26,
+      "median": -366.66,
+      "high": -340.95,
+      "scenario": -366.66,
+      "netChange": -6107.96
+    },
+    {
+      "date": "2026-10-02",
+      "low": -722.51,
+      "median": -375.32,
+      "high": -347.2,
+      "scenario": -375.32,
+      "netChange": -6116.62
+    },
+    {
+      "date": "2026-10-03",
+      "low": -728.76,
+      "median": -381.57,
+      "high": -353.45,
+      "scenario": -381.57,
+      "netChange": -6122.87
+    },
+    {
+      "date": "2026-10-04",
+      "low": -735.01,
+      "median": -387.82,
+      "high": -359.7,
+      "scenario": -387.82,
+      "netChange": -6129.12
+    },
+    {
+      "date": "2026-10-05",
+      "low": -769.26,
+      "median": -422.07,
+      "high": -393.95,
+      "scenario": -422.07,
+      "netChange": -6163.37
+    },
+    {
+      "date": "2026-10-06",
+      "low": -775.51,
+      "median": -428.32,
+      "high": -400.2,
+      "scenario": -428.32,
+      "netChange": -6169.62
+    },
+    {
+      "date": "2026-10-07",
+      "low": -781.76,
+      "median": -434.57,
+      "high": -406.45,
+      "scenario": -434.57,
+      "netChange": -6175.87
+    },
+    {
+      "date": "2026-10-08",
+      "low": -794.44,
+      "median": -457.7,
+      "high": -415.51,
+      "scenario": -457.7,
+      "netChange": -6199
+    },
+    {
+      "date": "2026-10-09",
+      "low": -364.31,
+      "median": -23.95,
+      "high": 18.24,
+      "scenario": -23.95,
+      "netChange": -5765.25
+    },
+    {
+      "date": "2026-10-10",
+      "low": -374.17,
+      "median": -30.2,
+      "high": 11.99,
+      "scenario": -30.2,
+      "netChange": -5771.5
+    },
+    {
+      "date": "2026-10-11",
+      "low": -384.04,
+      "median": -36.45,
+      "high": 5.74,
+      "scenario": -36.45,
+      "netChange": -5777.75
+    },
+    {
+      "date": "2026-10-12",
+      "low": -438.91,
+      "median": -87.7,
+      "high": -45.51,
+      "scenario": -87.7,
+      "netChange": -5829
+    },
+    {
+      "date": "2026-10-13",
+      "low": -446.76,
+      "median": -96.36,
+      "high": -51.76,
+      "scenario": -96.36,
+      "netChange": -5837.66
+    },
+    {
+      "date": "2026-10-14",
+      "low": -453.01,
+      "median": -105.82,
+      "high": -58.01,
+      "scenario": -105.82,
+      "netChange": -5847.12
+    },
+    {
+      "date": "2026-10-15",
+      "low": -486.76,
+      "median": -117.39,
+      "high": -67.24,
+      "scenario": -117.39,
+      "netChange": -5858.69
+    },
+    {
+      "date": "2026-10-16",
+      "low": -543.01,
+      "median": -170.51,
+      "high": -76.74,
+      "scenario": -170.51,
+      "netChange": -5911.81
+    },
+    {
+      "date": "2026-10-17",
+      "low": -599.26,
+      "median": -226.76,
+      "high": -86.24,
+      "scenario": -226.76,
+      "netChange": -5968.06
+    },
+    {
+      "date": "2026-10-18",
+      "low": -680.51,
+      "median": -308.01,
+      "high": -120.75,
+      "scenario": -308.01,
+      "netChange": -6049.31
+    },
+    {
+      "date": "2026-10-19",
+      "low": -736.76,
+      "median": -364.26,
+      "high": -130.25,
+      "scenario": -364.26,
+      "netChange": -6105.56
+    },
+    {
+      "date": "2026-10-20",
+      "low": -793.01,
+      "median": -420.51,
+      "high": -139.76,
+      "scenario": -420.51,
+      "netChange": -6161.81
+    },
+    {
+      "date": "2026-10-21",
+      "low": -824.23,
+      "median": -473.95,
+      "high": -146.45,
+      "scenario": -473.95,
+      "netChange": -6215.25
+    },
+    {
+      "date": "2026-10-22",
+      "low": -833.82,
+      "median": -480.2,
+      "high": -155.51,
+      "scenario": -480.2,
+      "netChange": -6221.5
+    },
+    {
+      "date": "2026-10-23",
+      "low": -403.68,
+      "median": -46.45,
+      "high": 278.24,
+      "scenario": -46.45,
+      "netChange": -5787.75
+    },
+    {
+      "date": "2026-10-24",
+      "low": -413.55,
+      "median": -52.7,
+      "high": 271.99,
+      "scenario": -52.7,
+      "netChange": -5794
+    },
+    {
+      "date": "2026-10-25",
+      "low": -423.41,
+      "median": -58.95,
+      "high": 265.74,
+      "scenario": -58.95,
+      "netChange": -5800.25
+    },
+    {
+      "date": "2026-10-26",
+      "low": -433.28,
+      "median": -65.2,
+      "high": 259.49,
+      "scenario": -65.2,
+      "netChange": -5806.5
+    },
+    {
+      "date": "2026-10-27",
+      "low": -443.15,
+      "median": -71.76,
+      "high": 253.24,
+      "scenario": -71.76,
+      "netChange": -5813.06
+    },
+    {
+      "date": "2026-10-28",
+      "low": -455.82,
+      "median": -100.2,
+      "high": 246.99,
+      "scenario": -100.2,
+      "netChange": -5841.5
+    },
+    {
+      "date": "2026-10-29",
+      "low": -464.77,
+      "median": -109.46,
+      "high": 237.93,
+      "scenario": -109.46,
+      "netChange": -5850.76
+    },
+    {
+      "date": "2026-10-30",
+      "low": -474.27,
+      "median": -115.91,
+      "high": 231.68,
+      "scenario": -115.91,
+      "netChange": -5857.21
+    },
+    {
+      "date": "2026-10-31",
+      "low": -483.78,
+      "median": -122.37,
+      "high": 225.43,
+      "scenario": -122.37,
+      "netChange": -5863.67
+    },
+    {
+      "date": "2026-11-01",
+      "low": -1226.78,
+      "median": -862.32,
+      "high": -514.32,
+      "scenario": -862.32,
+      "netChange": -6603.62
+    },
+    {
+      "date": "2026-11-02",
+      "low": -1236.28,
+      "median": -868.77,
+      "high": -520.57,
+      "scenario": -868.77,
+      "netChange": -6610.07
+    },
+    {
+      "date": "2026-11-03",
+      "low": -1245.79,
+      "median": -876.22,
+      "high": -526.82,
+      "scenario": -876.22,
+      "netChange": -6617.52
+    },
+    {
+      "date": "2026-11-04",
+      "low": -1255.57,
+      "median": -883.07,
+      "high": -533.07,
+      "scenario": -883.07,
+      "netChange": -6624.37
+    },
+    {
+      "date": "2026-11-05",
+      "low": -1293.44,
+      "median": -920.94,
+      "high": -583.36,
+      "scenario": -920.94,
+      "netChange": -6662.24
+    },
+    {
+      "date": "2026-11-06",
+      "low": -861.7,
+      "median": -490,
+      "high": -149.69,
+      "scenario": -490,
+      "netChange": -6231.3
+    },
+    {
+      "date": "2026-11-07",
+      "low": -870.36,
+      "median": -499.47,
+      "high": -156.26,
+      "scenario": -499.47,
+      "netChange": -6240.77
+    },
+    {
+      "date": "2026-11-08",
+      "low": -880.23,
+      "median": -508.93,
+      "high": -162.83,
+      "scenario": -508.93,
+      "netChange": -6250.23
+    },
+    {
+      "date": "2026-11-09",
+      "low": -890.09,
+      "median": -518.4,
+      "high": -169.2,
+      "scenario": -518.4,
+      "netChange": -6259.7
+    },
+    {
+      "date": "2026-11-10",
+      "low": -899.96,
+      "median": -527.46,
+      "high": -175.45,
+      "scenario": -527.46,
+      "netChange": -6268.76
+    },
+    {
+      "date": "2026-11-11",
+      "low": -909.82,
+      "median": -537.32,
+      "high": -181.7,
+      "scenario": -537.32,
+      "netChange": -6278.62
+    },
+    {
+      "date": "2026-11-12",
+      "low": -963.89,
+      "median": -591.59,
+      "high": -238.37,
+      "scenario": -591.59,
+      "netChange": -6332.89
+    },
+    {
+      "date": "2026-11-13",
+      "low": -970.14,
+      "median": -598.44,
+      "high": -244.82,
+      "scenario": -598.44,
+      "netChange": -6339.74
+    },
+    {
+      "date": "2026-11-14",
+      "low": -976.39,
+      "median": -606.3,
+      "high": -251.07,
+      "scenario": -606.3,
+      "netChange": -6347.6
+    },
+    {
+      "date": "2026-11-15",
+      "low": -982.64,
+      "median": -613.75,
+      "high": -257.32,
+      "scenario": -613.75,
+      "netChange": -6355.05
+    },
+    {
+      "date": "2026-11-16",
+      "low": -988.89,
+      "median": -620.61,
+      "high": -263.57,
+      "scenario": -620.61,
+      "netChange": -6361.91
+    },
+    {
+      "date": "2026-11-17",
+      "low": -995.34,
+      "median": -627.17,
+      "high": -269.82,
+      "scenario": -627.17,
+      "netChange": -6368.47
+    },
+    {
+      "date": "2026-11-18",
+      "low": -1029.48,
+      "median": -667.95,
+      "high": -303.61,
+      "scenario": -667.95,
+      "netChange": -6409.25
+    },
+    {
+      "date": "2026-11-19",
+      "low": -1057.95,
+      "median": -680.03,
+      "high": -323.4,
+      "scenario": -680.03,
+      "netChange": -6421.33
+    },
+    {
+      "date": "2026-11-20",
+      "low": -644.89,
+      "median": -248.89,
+      "high": 110.03,
+      "scenario": -248.89,
+      "netChange": -5990.19
+    },
+    {
+      "date": "2026-11-21",
+      "low": -655.57,
+      "median": -255.14,
+      "high": 103.46,
+      "scenario": -255.14,
+      "netChange": -5996.44
+    },
+    {
+      "date": "2026-11-22",
+      "low": -666.82,
+      "median": -261.39,
+      "high": 97.05,
+      "scenario": -261.39,
+      "netChange": -6002.69
+    },
+    {
+      "date": "2026-11-23",
+      "low": -678.07,
+      "median": -267.64,
+      "high": 90.8,
+      "scenario": -267.64,
+      "netChange": -6008.94
+    },
+    {
+      "date": "2026-11-24",
+      "low": -689.32,
+      "median": -273.89,
+      "high": 84.55,
+      "scenario": -273.89,
+      "netChange": -6015.19
+    },
+    {
+      "date": "2026-11-25",
+      "low": -700.57,
+      "median": -282.95,
+      "high": 78.3,
+      "scenario": -282.95,
+      "netChange": -6024.25
+    },
+    {
+      "date": "2026-11-26",
+      "low": -752.15,
+      "median": -292.21,
+      "high": 66.43,
+      "scenario": -292.21,
+      "netChange": -6033.51
+    },
+    {
+      "date": "2026-11-27",
+      "low": -803.72,
+      "median": -301.88,
+      "high": 60.18,
+      "scenario": -301.88,
+      "netChange": -6043.18
+    },
+    {
+      "date": "2026-11-28",
+      "low": -855.29,
+      "median": -311.34,
+      "high": 53.93,
+      "scenario": -311.34,
+      "netChange": -6052.64
+    },
+    {
+      "date": "2026-11-29",
+      "low": -906.86,
+      "median": -320.2,
+      "high": 47.68,
+      "scenario": -320.2,
+      "netChange": -6061.5
+    },
+    {
+      "date": "2026-11-30",
+      "low": -952.29,
+      "median": -328.26,
+      "high": 40.34,
+      "scenario": -328.26,
+      "netChange": -6069.56
+    },
+    {
+      "date": "2026-12-01",
+      "low": -1703.95,
+      "median": -1068.01,
+      "high": -700.86,
+      "scenario": -1068.01,
+      "netChange": -6809.31
+    },
+    {
+      "date": "2026-12-02",
+      "low": -1732.07,
+      "median": -1077.07,
+      "high": -707.39,
+      "scenario": -1077.07,
+      "netChange": -6818.37
+    },
+    {
+      "date": "2026-12-03",
+      "low": -1741.94,
+      "median": -1093.37,
+      "high": -722.44,
+      "scenario": -1093.37,
+      "netChange": -6834.67
+    },
+    {
+      "date": "2026-12-04",
+      "low": -1311.81,
+      "median": -677.7,
+      "high": -291.14,
+      "scenario": -677.7,
+      "netChange": -6419
+    },
+    {
+      "date": "2026-12-05",
+      "low": -1349.67,
+      "median": -713.96,
+      "high": -326.47,
+      "scenario": -713.96,
+      "netChange": -6455.26
+    },
+    {
+      "date": "2026-12-06",
+      "low": -1359.54,
+      "median": -721.01,
+      "high": -335.78,
+      "scenario": -721.01,
+      "netChange": -6462.31
+    },
+    {
+      "date": "2026-12-07",
+      "low": -1369.41,
+      "median": -727.26,
+      "high": -343.43,
+      "scenario": -727.26,
+      "netChange": -6468.56
+    },
+    {
+      "date": "2026-12-08",
+      "low": -1379.27,
+      "median": -733.51,
+      "high": -349.76,
+      "scenario": -733.51,
+      "netChange": -6474.81
+    },
+    {
+      "date": "2026-12-09",
+      "low": -1391.95,
+      "median": -741.17,
+      "high": -356.01,
+      "scenario": -741.17,
+      "netChange": -6482.47
+    },
+    {
+      "date": "2026-12-10",
+      "low": -1415.36,
+      "median": -753.24,
+      "high": -367.82,
+      "scenario": -753.24,
+      "netChange": -6494.54
+    },
+    {
+      "date": "2026-12-11",
+      "low": -1424.14,
+      "median": -788.98,
+      "high": -379.36,
+      "scenario": -788.98,
+      "netChange": -6530.28
+    },
+    {
+      "date": "2026-12-12",
+      "low": -1475.39,
+      "median": -890.23,
+      "high": -430.97,
+      "scenario": -890.23,
+      "netChange": -6631.53
+    },
+    {
+      "date": "2026-12-13",
+      "low": -1481.64,
+      "median": -946.48,
+      "high": -437.62,
+      "scenario": -946.48,
+      "netChange": -6687.78
+    },
+    {
+      "date": "2026-12-14",
+      "low": -1487.89,
+      "median": -1002.73,
+      "high": -446.04,
+      "scenario": -1002.73,
+      "netChange": -6744.03
+    },
+    {
+      "date": "2026-12-15",
+      "low": -1494.14,
+      "median": -1058.98,
+      "high": -452.49,
+      "scenario": -1058.98,
+      "netChange": -6800.28
+    },
+    {
+      "date": "2026-12-16",
+      "low": -1503.2,
+      "median": -1081.48,
+      "high": -461.64,
+      "scenario": -1081.48,
+      "netChange": -6822.78
+    },
+    {
+      "date": "2026-12-17",
+      "low": -1515.07,
+      "median": -1089.14,
+      "high": -473.91,
+      "scenario": -1089.14,
+      "netChange": -6830.44
+    },
+    {
+      "date": "2026-12-18",
+      "low": -1110.42,
+      "median": -680.39,
+      "high": -70.19,
+      "scenario": -680.39,
+      "netChange": -6421.69
+    },
+    {
+      "date": "2026-12-19",
+      "low": -1118.96,
+      "median": -686.64,
+      "high": -76.64,
+      "scenario": -686.64,
+      "netChange": -6427.94
+    },
+    {
+      "date": "2026-12-20",
+      "low": -1128.47,
+      "median": -692.89,
+      "high": -82.89,
+      "scenario": -692.89,
+      "netChange": -6434.19
+    },
+    {
+      "date": "2026-12-21",
+      "low": -1137.97,
+      "median": -699.14,
+      "high": -90.95,
+      "scenario": -699.14,
+      "netChange": -6440.44
+    },
+    {
+      "date": "2026-12-22",
+      "low": -1147.48,
+      "median": -720.66,
+      "high": -97.92,
+      "scenario": -720.66,
+      "netChange": -6461.96
+    },
+    {
+      "date": "2026-12-23",
+      "low": -1157.26,
+      "median": -732.73,
+      "high": -104.17,
+      "scenario": -732.73,
+      "netChange": -6474.03
+    },
+    {
+      "date": "2026-12-24",
+      "low": -1186.29,
+      "median": -740.39,
+      "high": -119.5,
+      "scenario": -740.39,
+      "netChange": -6481.69
+    },
+    {
+      "date": "2026-12-25",
+      "low": -1205.07,
+      "median": -746.64,
+      "high": -162.39,
+      "scenario": -746.64,
+      "netChange": -6487.94
+    },
+    {
+      "date": "2026-12-26",
+      "low": -1216.32,
+      "median": -752.89,
+      "high": -206.13,
+      "scenario": -752.89,
+      "netChange": -6494.19
+    },
+    {
+      "date": "2026-12-27",
+      "low": -1227.57,
+      "median": -759.14,
+      "high": -257.74,
+      "scenario": -759.14,
+      "netChange": -6500.44
+    },
+    {
+      "date": "2026-12-28",
+      "low": -1238.82,
+      "median": -765.39,
+      "high": -309.35,
+      "scenario": -765.39,
+      "netChange": -6506.69
+    },
+    {
+      "date": "2026-12-29",
+      "low": -1249.73,
+      "median": -791.32,
+      "high": -360.96,
+      "scenario": -791.32,
+      "netChange": -6532.62
+    },
+    {
+      "date": "2026-12-30",
+      "low": -1255.98,
+      "median": -803.2,
+      "high": -382.2,
+      "scenario": -803.2,
+      "netChange": -6544.5
+    },
+    {
+      "date": "2026-12-31",
+      "low": -1307.23,
+      "median": -815.07,
+      "high": -388.49,
+      "scenario": -815.07,
+      "netChange": -6556.37
+    },
+    {
+      "date": "2027-01-01",
+      "low": -1651.98,
+      "median": -1114.82,
+      "high": -690.04,
+      "scenario": -1114.82,
+      "netChange": -6856.12
+    },
+    {
+      "date": "2027-01-02",
+      "low": -1703.23,
+      "median": -1122.28,
+      "high": -701.29,
+      "scenario": -1122.28,
+      "netChange": -6863.58
+    },
+    {
+      "date": "2027-01-03",
+      "low": -1754.48,
+      "median": -1130.94,
+      "high": -712.54,
+      "scenario": -1130.94,
+      "netChange": -6872.24
+    },
+    {
+      "date": "2027-01-04",
+      "low": -1777.24,
+      "median": -1138.8,
+      "high": -723.79,
+      "scenario": -1138.8,
+      "netChange": -6880.1
+    },
+    {
+      "date": "2027-01-05",
+      "low": -1834.08,
+      "median": -1174.66,
+      "high": -766.42,
+      "scenario": -1174.66,
+      "netChange": -6915.96
+    },
+    {
+      "date": "2027-01-06",
+      "low": -1868.73,
+      "median": -1188.14,
+      "high": -786.11,
+      "scenario": -1188.14,
+      "netChange": -6929.44
+    },
+    {
+      "date": "2027-01-07",
+      "low": -1874.98,
+      "median": -1197.2,
+      "high": -792.68,
+      "scenario": -1197.2,
+      "netChange": -6938.5
+    },
+    {
+      "date": "2027-01-08",
+      "low": -1881.23,
+      "median": -1203.85,
+      "high": -799.25,
+      "scenario": -1203.85,
+      "netChange": -6945.15
+    },
+    {
+      "date": "2027-01-09",
+      "low": -1887.48,
+      "median": -1210.3,
+      "high": -805.82,
+      "scenario": -1210.3,
+      "netChange": -6951.6
+    },
+    {
+      "date": "2027-01-10",
+      "low": -1893.73,
+      "median": -1217.56,
+      "high": -812.39,
+      "scenario": -1217.56,
+      "netChange": -6958.86
+    },
+    {
+      "date": "2027-01-11",
+      "low": -1899.98,
+      "median": -1224.61,
+      "high": -821.49,
+      "scenario": -1224.61,
+      "netChange": -6965.91
+    },
+    {
+      "date": "2027-01-12",
+      "low": -1957.42,
+      "median": -1276.57,
+      "high": -874.99,
+      "scenario": -1276.57,
+      "netChange": -7017.87
+    },
+    {
+      "date": "2027-01-13",
+      "low": -1976.89,
+      "median": -1285.32,
+      "high": -884.42,
+      "scenario": -1285.32,
+      "netChange": -7026.62
+    },
+    {
+      "date": "2027-01-14",
+      "low": -1986.87,
+      "median": -1306.93,
+      "high": -899.75,
+      "scenario": -1306.93,
+      "netChange": -7048.23
+    },
+    {
+      "date": "2027-01-15",
+      "low": -1557.82,
+      "median": -876.51,
+      "high": -468.17,
+      "scenario": -876.51,
+      "netChange": -6617.81
+    },
+    {
+      "date": "2027-01-16",
+      "low": -1564.2,
+      "median": -882.96,
+      "high": -474.42,
+      "scenario": -882.96,
+      "netChange": -6624.26
+    },
+    {
+      "date": "2027-01-17",
+      "low": -1572.21,
+      "median": -889.41,
+      "high": -480.67,
+      "scenario": -889.41,
+      "netChange": -6630.71
+    },
+    {
+      "date": "2027-01-18",
+      "low": -1606.68,
+      "median": -920.86,
+      "high": -511.92,
+      "scenario": -920.86,
+      "netChange": -6662.16
+    },
+    {
+      "date": "2027-01-19",
+      "low": -1618.99,
+      "median": -929.52,
+      "high": -521.26,
+      "scenario": -929.52,
+      "netChange": -6670.82
+    },
+    {
+      "date": "2027-01-20",
+      "low": -1628.42,
+      "median": -939.39,
+      "high": -538.76,
+      "scenario": -939.39,
+      "netChange": -6680.69
+    },
+    {
+      "date": "2027-01-21",
+      "low": -1640.66,
+      "median": -953.76,
+      "high": -547.58,
+      "scenario": -953.76,
+      "netChange": -6695.06
+    },
+    {
+      "date": "2027-01-22",
+      "low": -1649.07,
+      "median": -967.36,
+      "high": -553.87,
+      "scenario": -967.36,
+      "netChange": -6708.66
+    },
+    {
+      "date": "2027-01-23",
+      "low": -1655.32,
+      "median": -973.61,
+      "high": -560.16,
+      "scenario": -973.61,
+      "netChange": -6714.91
+    },
+    {
+      "date": "2027-01-24",
+      "low": -1661.57,
+      "median": -980.06,
+      "high": -566.45,
+      "scenario": -980.06,
+      "netChange": -6721.36
+    },
+    {
+      "date": "2027-01-25",
+      "low": -1667.82,
+      "median": -988.12,
+      "high": -572.74,
+      "scenario": -988.12,
+      "netChange": -6729.42
+    },
+    {
+      "date": "2027-01-26",
+      "low": -1674.07,
+      "median": -996.17,
+      "high": -581.61,
+      "scenario": -996.17,
+      "netChange": -6737.47
+    },
+    {
+      "date": "2027-01-27",
+      "low": -1680.61,
+      "median": -1015.48,
+      "high": -587.86,
+      "scenario": -1015.48,
+      "netChange": -6756.78
+    },
+    {
+      "date": "2027-01-28",
+      "low": -1695.05,
+      "median": -1025.95,
+      "high": -605.36,
+      "scenario": -1025.95,
+      "netChange": -6767.25
+    },
+    {
+      "date": "2027-01-29",
+      "low": -1265.36,
+      "median": -601.44,
+      "high": -174.42,
+      "scenario": -601.44,
+      "netChange": -6342.74
+    },
+    {
+      "date": "2027-01-30",
+      "low": -1274.5,
+      "median": -610.91,
+      "high": -180.79,
+      "scenario": -610.91,
+      "netChange": -6352.21
+    },
+    {
+      "date": "2027-01-31",
+      "low": -1282.2,
+      "median": -617.36,
+      "high": -187.2,
+      "scenario": -617.36,
+      "netChange": -6358.66
+    },
+    {
+      "date": "2027-02-01",
+      "low": -2023.16,
+      "median": -1357.11,
+      "high": -928.76,
+      "scenario": -1357.11,
+      "netChange": -7098.41
+    },
+    {
+      "date": "2027-02-02",
+      "low": -2031.21,
+      "median": -1364.36,
+      "high": -935.97,
+      "scenario": -1364.36,
+      "netChange": -7105.66
+    },
+    {
+      "date": "2027-02-03",
+      "low": -2043.17,
+      "median": -1372.42,
+      "high": -945.07,
+      "scenario": -1372.42,
+      "netChange": -7113.72
+    },
+    {
+      "date": "2027-02-04",
+      "low": -2075.39,
+      "median": -1399.45,
+      "high": -960.12,
+      "scenario": -1399.45,
+      "netChange": -7140.75
+    },
+    {
+      "date": "2027-02-05",
+      "low": -2130.27,
+      "median": -1477.76,
+      "high": -994.74,
+      "scenario": -1477.76,
+      "netChange": -7219.06
+    },
+    {
+      "date": "2027-02-06",
+      "low": -2146.5,
+      "median": -1534.01,
+      "high": -1001.47,
+      "scenario": -1534.01,
+      "netChange": -7275.31
+    },
+    {
+      "date": "2027-02-07",
+      "low": -2160.65,
+      "median": -1590.26,
+      "high": -1010.65,
+      "scenario": -1590.26,
+      "netChange": -7331.56
+    },
+    {
+      "date": "2027-02-08",
+      "low": -2174.79,
+      "median": -1646.51,
+      "high": -1017.5,
+      "scenario": -1646.51,
+      "netChange": -7387.81
+    },
+    {
+      "date": "2027-02-09",
+      "low": -2188.93,
+      "median": -1675.53,
+      "high": -1024.6,
+      "scenario": -1675.53,
+      "netChange": -7416.83
+    },
+    {
+      "date": "2027-02-10",
+      "low": -2199.7,
+      "median": -1685.89,
+      "high": -1033.42,
+      "scenario": -1685.89,
+      "netChange": -7427.19
+    },
+    {
+      "date": "2027-02-11",
+      "low": -2205.95,
+      "median": -1692.54,
+      "high": -1045.57,
+      "scenario": -1692.54,
+      "netChange": -7433.84
+    },
+    {
+      "date": "2027-02-12",
+      "low": -1848.98,
+      "median": -1304.79,
+      "high": -659.64,
+      "scenario": -1304.79,
+      "netChange": -7046.09
+    },
+    {
+      "date": "2027-02-13",
+      "low": -1900.23,
+      "median": -1311.04,
+      "high": -665.89,
+      "scenario": -1311.04,
+      "netChange": -7052.34
+    },
+    {
+      "date": "2027-02-14",
+      "low": -1951.48,
+      "median": -1317.29,
+      "high": -672.14,
+      "scenario": -1317.29,
+      "netChange": -7058.59
+    },
+    {
+      "date": "2027-02-15",
+      "low": -1994.98,
+      "median": -1329.17,
+      "high": -678.39,
+      "scenario": -1329.17,
+      "netChange": -7070.47
+    },
+    {
+      "date": "2027-02-16",
+      "low": -2035.76,
+      "median": -1345.26,
+      "high": -684.64,
+      "scenario": -1345.26,
+      "netChange": -7086.56
+    },
+    {
+      "date": "2027-02-17",
+      "low": -2068.39,
+      "median": -1357.14,
+      "high": -693.42,
+      "scenario": -1357.14,
+      "netChange": -7098.44
+    },
+    {
+      "date": "2027-02-18",
+      "low": -2108.57,
+      "median": -1396.82,
+      "high": -735.96,
+      "scenario": -1396.82,
+      "netChange": -7138.12
+    },
+    {
+      "date": "2027-02-19",
+      "low": -2115.17,
+      "median": -1403.48,
+      "high": -745.26,
+      "scenario": -1403.48,
+      "netChange": -7144.78
+    },
+    {
+      "date": "2027-02-20",
+      "low": -2122.5,
+      "median": -1412.54,
+      "high": -751.51,
+      "scenario": -1412.54,
+      "netChange": -7153.84
+    },
+    {
+      "date": "2027-02-21",
+      "low": -2131.65,
+      "median": -1421.6,
+      "high": -758.12,
+      "scenario": -1421.6,
+      "netChange": -7162.9
+    },
+    {
+      "date": "2027-02-22",
+      "low": -2140.79,
+      "median": -1431.47,
+      "high": -765.82,
+      "scenario": -1431.47,
+      "netChange": -7172.77
+    },
+    {
+      "date": "2027-02-23",
+      "low": -2150.49,
+      "median": -1441.94,
+      "high": -772.49,
+      "scenario": -1441.94,
+      "netChange": -7183.24
+    },
+    {
+      "date": "2027-02-24",
+      "low": -2170.89,
+      "median": -1459.64,
+      "high": -779.32,
+      "scenario": -1459.64,
+      "netChange": -7200.94
+    },
+    {
+      "date": "2027-02-25",
+      "low": -2180.59,
+      "median": -1473.32,
+      "high": -794.37,
+      "scenario": -1473.32,
+      "netChange": -7214.62
+    },
+    {
+      "date": "2027-02-26",
+      "low": -1749.09,
+      "median": -1043.79,
+      "high": -365.76,
+      "scenario": -1043.79,
+      "netChange": -6785.09
+    },
+    {
+      "date": "2027-02-27",
+      "low": -1755.54,
+      "median": -1050.84,
+      "high": -374.67,
+      "scenario": -1050.84,
+      "netChange": -6792.14
+    },
+    {
+      "date": "2027-02-28",
+      "low": -1764.37,
+      "median": -1058.9,
+      "high": -380.92,
+      "scenario": -1058.9,
+      "netChange": -6800.2
+    },
+    {
+      "date": "2027-03-01",
+      "low": -2504.28,
+      "median": -1800.86,
+      "high": -1120.87,
+      "scenario": -1800.86,
+      "netChange": -7542.16
+    },
+    {
+      "date": "2027-03-02",
+      "low": -2510.57,
+      "median": -1810.12,
+      "high": -1129.37,
+      "scenario": -1810.12,
+      "netChange": -7551.42
+    },
+    {
+      "date": "2027-03-03",
+      "low": -2516.86,
+      "median": -1819.39,
+      "high": -1138.51,
+      "scenario": -1819.39,
+      "netChange": -7560.69
+    },
+    {
+      "date": "2027-03-04",
+      "low": -2528.45,
+      "median": -1832.67,
+      "high": -1158.66,
+      "scenario": -1832.67,
+      "netChange": -7573.97
+    },
+    {
+      "date": "2027-03-05",
+      "low": -2562.98,
+      "median": -1871.14,
+      "high": -1199.5,
+      "scenario": -1871.14,
+      "netChange": -7612.44
+    },
+    {
+      "date": "2027-03-06",
+      "low": -2570.32,
+      "median": -1877.39,
+      "high": -1206.16,
+      "scenario": -1877.39,
+      "netChange": -7618.69
+    },
+    {
+      "date": "2027-03-07",
+      "low": -2578.01,
+      "median": -1885.24,
+      "high": -1212.81,
+      "scenario": -1885.24,
+      "netChange": -7626.54
+    },
+    {
+      "date": "2027-03-08",
+      "low": -2584.26,
+      "median": -1893.3,
+      "high": -1219.46,
+      "scenario": -1893.3,
+      "netChange": -7634.6
+    },
+    {
+      "date": "2027-03-09",
+      "low": -2590.51,
+      "median": -1901.56,
+      "high": -1226.11,
+      "scenario": -1901.56,
+      "netChange": -7642.86
+    },
+    {
+      "date": "2027-03-10",
+      "low": -2605.2,
+      "median": -1910.82,
+      "high": -1232.76,
+      "scenario": -1910.82,
+      "netChange": -7652.12
+    },
+    {
+      "date": "2027-03-11",
+      "low": -2616.05,
+      "median": -1920.09,
+      "high": -1239.09,
+      "scenario": -1920.09,
+      "netChange": -7661.39
+    },
+    {
+      "date": "2027-03-12",
+      "low": -2230.62,
+      "median": -1534.35,
+      "high": -858.42,
+      "scenario": -1534.35,
+      "netChange": -7275.65
+    },
+    {
+      "date": "2027-03-13",
+      "low": -2240.12,
+      "median": -1542.21,
+      "high": -864.91,
+      "scenario": -1542.21,
+      "netChange": -7283.51
+    },
+    {
+      "date": "2027-03-14",
+      "low": -2249.26,
+      "median": -1548.66,
+      "high": -871.52,
+      "scenario": -1548.66,
+      "netChange": -7289.96
+    },
+    {
+      "date": "2027-03-15",
+      "low": -2255.51,
+      "median": -1556.52,
+      "high": -879.1,
+      "scenario": -1556.52,
+      "netChange": -7297.82
+    }
+  ],
+  "tuition": [
+    {
+      "id": "tuition",
+      "name": "Fall tuition",
+      "dueDate": "2026-09-25",
+      "amount": 5250,
+      "status": "forecast",
+      "firstCashCoverageDate": null,
+      "gapAtDeadline": 472.45,
+      "extraPerWeek": 367.46,
+      "successRate": 0,
+      "scenarioSuccessRate": 0
+    },
+    {
+      "id": "fees",
+      "name": "Student fees",
+      "dueDate": "2026-09-25",
+      "amount": 420,
+      "status": "forecast",
+      "firstCashCoverageDate": "2026-09-16",
+      "gapAtDeadline": 472.45,
+      "extraPerWeek": 367.46,
+      "successRate": 0,
+      "scenarioSuccessRate": 0
+    }
+  ],
+  "goals": [
+    {
+      "id": "emergency",
+      "name": "Emergency fund",
+      "target": 1500,
+      "current": 450,
+      "deadline": "2026-12-31",
+      "priority": "High",
+      "projectedDate": null,
+      "status": "forecast",
+      "projectedAmount": 450,
+      "successRate": 0,
+      "extraPerMonth": 301.5
+    },
+    {
+      "id": "laptop",
+      "name": "Next laptop",
+      "target": 1200,
+      "current": 180,
+      "deadline": "2027-08-01",
+      "priority": "Medium",
+      "projectedDate": null,
+      "status": "beyond_horizon",
+      "projectedAmount": 180,
+      "successRate": null,
+      "extraPerMonth": null
+    }
+  ],
+  "models": [
+    {
+      "series": "Variable weekly spending",
+      "selected": "Recent average",
+      "trainingWeeks": 36,
+      "validationWeeks": 8,
+      "mae": 50.78,
+      "candidates": [
+        {
+          "name": "Recent average",
+          "mae": 50.78
+        },
+        {
+          "name": "Ridge regression",
+          "mae": 50
+        },
+        {
+          "name": "Gradient boosting",
+          "mae": 48.7
+        }
+      ],
+      "reason": "Lowest chronological holdout error; learned models must beat the baseline by 5%."
+    },
+    {
+      "series": "Variable weekly earnings",
+      "selected": "Recent average",
+      "trainingWeeks": 36,
+      "validationWeeks": 8,
+      "mae": 0,
+      "candidates": [
+        {
+          "name": "Recent average",
+          "mae": 0
+        },
+        {
+          "name": "Ridge regression",
+          "mae": 0
+        },
+        {
+          "name": "Gradient boosting",
+          "mae": 0
+        }
+      ],
+      "reason": "Lowest chronological holdout error; learned models must beat the baseline by 5%."
+    }
+  ],
+  "recurring": [
+    {
+      "merchant": "Public Mobile",
+      "category": "Phone and Internet",
+      "amount": 45,
+      "direction": "expense",
+      "frequency": "Monthly",
+      "nextDate": "2026-10-12",
+      "observations": 9,
+      "confidence": "Pattern detected; confirm it is still active",
+      "included": false
+    },
+    {
+      "merchant": "Spotify Student",
+      "category": "Subscriptions",
+      "amount": 6.39,
+      "direction": "expense",
+      "frequency": "Monthly",
+      "nextDate": "2026-10-05",
+      "observations": 9,
+      "confidence": "Pattern detected; confirm it is still active",
+      "included": false
+    },
+    {
+      "merchant": "Netflix",
+      "category": "Subscriptions",
+      "amount": 16.49,
+      "direction": "expense",
+      "frequency": "Monthly",
+      "nextDate": "2026-10-05",
+      "observations": 9,
+      "confidence": "Pattern detected; confirm it is still active",
+      "included": false
+    },
+    {
+      "merchant": "iCloud+",
+      "category": "Subscriptions",
+      "amount": 3.99,
+      "direction": "expense",
+      "frequency": "Monthly",
+      "nextDate": "2026-10-05",
+      "observations": 9,
+      "confidence": "Pattern detected; confirm it is still active",
+      "included": false
+    },
+    {
+      "merchant": "PRESTO monthly reload",
+      "category": "TTC and PRESTO",
+      "amount": 128,
+      "direction": "expense",
+      "frequency": "Monthly",
+      "nextDate": "2026-10-01",
+      "observations": 9,
+      "confidence": "Pattern detected; confirm it is still active",
+      "included": false
+    },
+    {
+      "merchant": "Community gym",
+      "category": "Fitness",
+      "amount": 25,
+      "direction": "expense",
+      "frequency": "Monthly",
+      "nextDate": "2026-09-18",
+      "observations": 8,
+      "confidence": "Pattern detected; confirm it is still active",
+      "included": true
+    }
+  ],
+  "categories": [
+    {
+      "category": "Textbooks and Supplies",
+      "last30": 350,
+      "previous30": 0,
+      "changePercent": null
+    },
+    {
+      "category": "Eating Out",
+      "last30": 193,
+      "previous30": 205,
+      "changePercent": -5.9
+    },
+    {
+      "category": "Groceries",
+      "last30": 184,
+      "previous30": 184,
+      "changePercent": 0
+    },
+    {
+      "category": "TTC and PRESTO",
+      "last30": 128,
+      "previous30": 128,
+      "changePercent": 0
+    },
+    {
+      "category": "Coffee",
+      "last30": 69.95,
+      "previous30": 75.2,
+      "changePercent": -7
+    },
+    {
+      "category": "Phone and Internet",
+      "last30": 45,
+      "previous30": 45,
+      "changePercent": 0
+    },
+    {
+      "category": "Subscriptions",
+      "last30": 26.87,
+      "previous30": 26.87,
+      "changePercent": 0
+    },
+    {
+      "category": "Fitness",
+      "last30": 25,
+      "previous30": 0,
+      "changePercent": null
+    },
+    {
+      "category": "Entertainment",
+      "last30": 22.5,
+      "previous30": 22.5,
+      "changePercent": 0
+    },
+    {
+      "category": "Shopping",
+      "last30": 0,
+      "previous30": 48.5,
+      "changePercent": -100
+    },
+    {
+      "category": "Tuition and School",
+      "last30": 0,
+      "previous30": 0,
+      "changePercent": null
+    }
+  ],
+  "anomalies": [],
+  "upcoming": [
+    {
+      "date": "2026-09-18",
+      "label": "Community gym",
+      "amount": 25,
+      "direction": "expense",
+      "origin": "Detected pattern"
+    },
+    {
+      "date": "2026-09-25",
+      "label": "Fall tuition",
+      "amount": 5250,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-09-25",
+      "label": "Part-time campus job",
+      "amount": 440,
+      "direction": "income",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-09-25",
+      "label": "Student fees",
+      "amount": 420,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-10-01",
+      "label": "Coffee",
+      "amount": 65,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-10-01",
+      "label": "Eating out",
+      "amount": 210,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-10-01",
+      "label": "Groceries",
+      "amount": 160,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-10-01",
+      "label": "Shopping & entertainment",
+      "amount": 170.5,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-10-01",
+      "label": "TTC / PRESTO",
+      "amount": 128,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-10-05",
+      "label": "Subscriptions",
+      "amount": 28,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-10-09",
+      "label": "Part-time campus job",
+      "amount": 440,
+      "direction": "income",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-10-12",
+      "label": "Phone plan",
+      "amount": 45,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-10-18",
+      "label": "Community gym",
+      "amount": 25,
+      "direction": "expense",
+      "origin": "Detected pattern"
+    },
+    {
+      "date": "2026-10-23",
+      "label": "Part-time campus job",
+      "amount": 440,
+      "direction": "income",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-11-01",
+      "label": "Coffee",
+      "amount": 65,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-11-01",
+      "label": "Eating out",
+      "amount": 210,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-11-01",
+      "label": "Groceries",
+      "amount": 160,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-11-01",
+      "label": "Shopping & entertainment",
+      "amount": 170.5,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-11-01",
+      "label": "TTC / PRESTO",
+      "amount": 128,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-11-05",
+      "label": "Subscriptions",
+      "amount": 28,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-11-06",
+      "label": "Part-time campus job",
+      "amount": 440,
+      "direction": "income",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-11-12",
+      "label": "Phone plan",
+      "amount": 45,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-11-18",
+      "label": "Community gym",
+      "amount": 25,
+      "direction": "expense",
+      "origin": "Detected pattern"
+    },
+    {
+      "date": "2026-11-20",
+      "label": "Part-time campus job",
+      "amount": 440,
+      "direction": "income",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-12-01",
+      "label": "Coffee",
+      "amount": 65,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-12-01",
+      "label": "Eating out",
+      "amount": 210,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-12-01",
+      "label": "Groceries",
+      "amount": 160,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-12-01",
+      "label": "Shopping & entertainment",
+      "amount": 170.5,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-12-01",
+      "label": "TTC / PRESTO",
+      "amount": 128,
+      "direction": "expense",
+      "origin": "Your plan"
+    },
+    {
+      "date": "2026-12-04",
+      "label": "Part-time campus job",
+      "amount": 440,
+      "direction": "income",
+      "origin": "Your plan"
+    }
+  ],
+  "recommendations": [
+    {
+      "title": "Close the gap for Fall tuition",
+      "detail": "The median forecast is short by $472.45 at the deadline. About $367.46 extra per week would close that modeled gap.",
+      "action": "scenario"
+    },
+    {
+      "title": "Close the gap for Student fees",
+      "detail": "The median forecast is short by $472.45 at the deadline. About $367.46 extra per week would close that modeled gap.",
+      "action": "scenario"
+    },
+    {
+      "title": "Protect your cash buffer",
+      "detail": "The median path drops below your protected balance on 2026-09-25. Review upcoming bills and confirmed funding.",
+      "action": "semester"
+    },
+    {
+      "title": "Review recurring subscriptions",
+      "detail": "Check the detected recurring payments below. A pattern is not proof that a subscription is still active.",
+      "action": "transactions"
+    }
+  ],
+  "assumptions": [
+    "The band is the 10th to 90th percentile of 400 modeled paths, not a guaranteed or calibrated 80% confidence interval. Success rates describe these simulations only.",
+    "Variable activity is modeled weekly and spread across days. Actual purchase and variable pay dates can differ. Detected recurring payments use estimated dates and median amounts.",
+    "Current CAD cash is the starting balance. Credit balances, pending outflows, and existing goal savings are reserved. Investment and loan balances are not cash.",
+    "Monthly expense plans replace learned spending in their category. Tuition uses entered dates only. Other one-time expenses are additional future obligations.",
+    "Future confirmed funding and expected earned funding are included. Received money is already in the starting balance; applied or unconfirmed non-earned funding is excluded.",
+    "Entered future earned funding replaces detected and learned employment income. Historical grants, loans, gifts, transfers, card repayments, and refunds are not recurring earnings.",
+    "Goals share one cash pool in priority/deadline order and protect the lowest remaining forecast balance through the horizon. Existing saved goal amounts must already be part of starting cash.",
+    "Tuition readiness tests cash after the bill, buffer, and existing savings reserves. Its first cash coverage date can be temporary; check the deadline result as well.",
+    "A complete view requires all relevant accounts. Earliest observed activity does not prove uninterrupted coverage. An empty day in imported history is treated as no activity.",
+    "The what-if path adds your assumed extra income and reduces only modeled variable flexible spending. It changes no saved plan and makes no payments."
+  ],
+  "assistant": [
+    {
+      "id": "tuition",
+      "question": "Can I cover my tuition?",
+      "answers": [
+        "Fall tuition is short by $472.45 CAD in the median path on 2026-09-25. An additional $367.46 CAD each week is the modeled gap-closing target, after other bills and protected balances.",
+        "Student fees is short by $472.45 CAD in the median path on 2026-09-25. An additional $367.46 CAD each week is the modeled gap-closing target, after other bills and protected balances."
+      ]
+    },
+    {
+      "id": "goals",
+      "question": "When could I reach my goals?",
+      "answers": [
+        "Emergency fund: not projected to be fully funded within this horizon. Goals share available cash in priority order.",
+        "Next laptop: not projected to be fully funded within this horizon. Goals share available cash in priority order."
+      ]
+    },
+    {
+      "id": "cash",
+      "question": "What might the next month look like?",
+      "answers": [
+        "Modeled incoming money: $880.00 CAD. Modeled spending and planned bills: $6,791.81 CAD. The difference is $-5,911.81 CAD.",
+        "Your cash buffer could be breached on 2026-09-25. Review scheduled funding and tuition."
+      ]
+    },
+    {
+      "id": "spending",
+      "question": "What spending should I review?",
+      "answers": [
+        "No positive category increase with a comparable prior 30-day window was detected. Review recurring payments and unusually large transactions below."
+      ]
+    },
+    {
+      "id": "confidence",
+      "question": "How much should I trust this forecast?",
+      "answers": [
+        "This snapshot includes 363 posted CAD transactions over 259 observed days, with 36 complete weeks.",
+        "Models are tested on later weeks using only earlier data. Learned models are used only when they outperform the recent-average baseline. Scheduled bills and recurring patterns are separate assumptions, not backtested guarantees.",
+        "Ranges and success rates summarize 400 simulated paths. They are not calibrated probabilities. Job changes, unlinked accounts, missing history, new bills, and stale balances can change the outcome."
+      ]
+    }
+  ],
+  "creditCards": {
+    "reviewedAt": "2026-09-18",
+    "stale": false,
+    "observedDays": 90,
+    "enoughHistory": true,
+    "monthlyEligibleSpend": 832.55,
+    "excludedOutflows": 0,
+    "paidInFull": "unknown",
+    "warnings": [
+      "These are four Canadian options, not a market-wide search or an approval prediction.",
+      "Estimates assume the same spending mix for a year and full, on-time statement payments. Interest, surcharges, welcome bonuses and insurance values are excluded.",
+      "Issuer merchant codes and card acceptance can differ from Plaid categories. Rent, tuition, transfers and unreviewed purchases are excluded; healthcare is modeled at the base rate.",
+      "Monthly caps use a typical calendar month; annual caps use twelve repeated months. Uneven spending and statement dates can change actual rewards.",
+      "Points use the published 1 cent per point statement-credit value. Travel-transfer values and streaming bonuses are not assumed."
+    ],
+    "cards": [
+      {
+        "id": "simplii",
+        "name": "Simplii Cash Back Visa",
+        "kind": "Cash back",
+        "network": "Visa",
+        "annualFee": 0,
+        "url": "https://www.simplii.com/en/credit-cards/cash-back-visa.html",
+        "terms": "4% on the first $5,000/year at restaurants; 1.5% on the first combined $15,000/year of gas, groceries, drugstores and pre-authorized bills; 0.5% otherwise.",
+        "benefits": [
+          "Dining-focused rewards",
+          "Automatic annual cash-back redemption"
+        ],
+        "eligibility": "Published minimum household income: $15,000. Canadian citizens/permanent residents outside Quebec, age of majority and credit approval required.",
+        "sources": [
+          "https://www.simplii.com/en/credit-cards/cash-back-visa.html",
+          "https://www.simplii.com/content/dam/simplii-public-assets/documents/pdf/credit-cards/cash-back-visa-benefits-guide.pdf"
+        ],
+        "annualRewards": 181.82,
+        "annualNet": 181.82,
+        "annualPoints": null,
+        "chosenCategories": [],
+        "breakdown": [
+          {
+            "category": "Bills",
+            "monthlySpend": 72.92,
+            "annualRewards": 4.38
+          },
+          {
+            "category": "Dining",
+            "monthlySpend": 260.63,
+            "annualRewards": 125.1
+          },
+          {
+            "category": "Entertainment",
+            "monthlySpend": 22.83,
+            "annualRewards": 1.37
+          },
+          {
+            "category": "Fitness",
+            "monthlySpend": 16.91,
+            "annualRewards": 1.01
+          },
+          {
+            "category": "Groceries",
+            "monthlySpend": 186.68,
+            "annualRewards": 33.6
+          },
+          {
+            "category": "Other purchases",
+            "monthlySpend": 142.72,
+            "annualRewards": 8.56
+          },
+          {
+            "category": "Transit",
+            "monthlySpend": 129.87,
+            "annualRewards": 7.79
+          }
+        ]
+      },
+      {
+        "id": "cobalt",
+        "name": "American Express Cobalt",
+        "kind": "Points",
+        "network": "American Express",
+        "annualFee": 191.88,
+        "url": "https://www.americanexpress.com/en-ca/credit-cards/cobalt-card/",
+        "terms": "5 points/$ on eligible Canadian food purchases up to $2,500/month, then 1; 2 on gas/transit; 1 otherwise. Eligible streaming earns 3 but is conservatively modeled at 1.",
+        "benefits": [
+          "Flexible Membership Rewards redemptions",
+          "Food and local transport earn bonuses"
+        ],
+        "eligibility": "Age, Canadian residency and credit approval requirements apply. Check acceptance at your usual stores. Fee is $15.99/month outside Quebec, $191.88/year in Quebec.",
+        "sources": [
+          "https://www.americanexpress.com/ca/en/benefits/cobalt-card/",
+          "https://www.americanexpress.com/en-ca/benefits/upgrade/cobalt-to-gold-card/",
+          "https://www.americanexpress.com/ca/en/benefits/membership-benefits/pay-with-points.html"
+        ],
+        "annualRewards": 330.2,
+        "annualNet": 138.32,
+        "annualPoints": 33020,
+        "chosenCategories": [],
+        "breakdown": [
+          {
+            "category": "Bills",
+            "monthlySpend": 72.92,
+            "annualRewards": 8.75
+          },
+          {
+            "category": "Dining",
+            "monthlySpend": 260.63,
+            "annualRewards": 156.38
+          },
+          {
+            "category": "Entertainment",
+            "monthlySpend": 22.83,
+            "annualRewards": 2.74
+          },
+          {
+            "category": "Fitness",
+            "monthlySpend": 16.91,
+            "annualRewards": 2.03
+          },
+          {
+            "category": "Groceries",
+            "monthlySpend": 186.68,
+            "annualRewards": 112.01
+          },
+          {
+            "category": "Other purchases",
+            "monthlySpend": 142.72,
+            "annualRewards": 17.13
+          },
+          {
+            "category": "Transit",
+            "monthlySpend": 129.87,
+            "annualRewards": 31.17
+          }
+        ]
+      },
+      {
+        "id": "tangerine",
+        "name": "Tangerine Money-Back Mastercard",
+        "kind": "Cash back",
+        "network": "Mastercard",
+        "annualFee": 0,
+        "url": "https://www.tangerine.ca/en/personal/spend/credit-cards/money-back-credit-card",
+        "terms": "2% in two selected categories; 0.5% elsewhere. A third category requires rewards deposited into Tangerine Savings.",
+        "benefits": [
+          "Choose categories to match your spending",
+          "Monthly rewards payout"
+        ],
+        "eligibility": "Issuer checks income, residency, age and credit. Published minimum gross annual income: $12,000. Confirm residency requirements with Tangerine.",
+        "sources": [
+          "https://www.tangerine.ca/en/personal/spend/credit-cards/money-back-credit-card"
+        ],
+        "annualRewards": 130.47,
+        "annualNet": 130.47,
+        "annualPoints": null,
+        "chosenCategories": [
+          "Dining",
+          "Groceries"
+        ],
+        "breakdown": [
+          {
+            "category": "Bills",
+            "monthlySpend": 72.92,
+            "annualRewards": 4.38
+          },
+          {
+            "category": "Dining",
+            "monthlySpend": 260.63,
+            "annualRewards": 62.55
+          },
+          {
+            "category": "Entertainment",
+            "monthlySpend": 22.83,
+            "annualRewards": 1.37
+          },
+          {
+            "category": "Fitness",
+            "monthlySpend": 16.91,
+            "annualRewards": 1.01
+          },
+          {
+            "category": "Groceries",
+            "monthlySpend": 186.68,
+            "annualRewards": 44.8
+          },
+          {
+            "category": "Other purchases",
+            "monthlySpend": 142.72,
+            "annualRewards": 8.56
+          },
+          {
+            "category": "Transit",
+            "monthlySpend": 129.87,
+            "annualRewards": 7.79
+          }
+        ]
+      },
+      {
+        "id": "bmo",
+        "name": "BMO CashBack Mastercard",
+        "kind": "Cash back",
+        "network": "Mastercard",
+        "annualFee": 0,
+        "url": "https://www.bmo.com/main/personal/credit-cards/bmo-cashback-mastercard/",
+        "terms": "3% on the first $500 of groceries per statement; 1% on the first $500 of recurring bills; 0.5% otherwise.",
+        "benefits": [
+          "Grocery bonus without an annual fee",
+          "Cash-back redemption starts at $1"
+        ],
+        "eligibility": "Canadian residency, age and credit approval requirements apply. Student eligibility is assessed by BMO.",
+        "sources": [
+          "https://www.bmo.com/main/personal/credit-cards/bmo-cashback-mastercard/"
+        ],
+        "annualRewards": 105.96,
+        "annualNet": 105.96,
+        "annualPoints": null,
+        "chosenCategories": [],
+        "breakdown": [
+          {
+            "category": "Bills",
+            "monthlySpend": 72.92,
+            "annualRewards": 4.38
+          },
+          {
+            "category": "Dining",
+            "monthlySpend": 260.63,
+            "annualRewards": 15.64
+          },
+          {
+            "category": "Entertainment",
+            "monthlySpend": 22.83,
+            "annualRewards": 1.37
+          },
+          {
+            "category": "Fitness",
+            "monthlySpend": 16.91,
+            "annualRewards": 1.01
+          },
+          {
+            "category": "Groceries",
+            "monthlySpend": 186.68,
+            "annualRewards": 67.21
+          },
+          {
+            "category": "Other purchases",
+            "monthlySpend": 142.72,
+            "annualRewards": 8.56
+          },
+          {
+            "category": "Transit",
+            "monthlySpend": 129.87,
+            "annualRewards": 7.79
+          }
+        ]
+      }
+    ],
+    "recommendedId": null
+  }
+}

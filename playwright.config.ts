@@ -1,0 +1,46 @@
+import { defineConfig, devices } from '@playwright/test';
+export default defineConfig({
+  testDir: './tests/e2e',
+  fullyParallel: false,
+  workers: 1,
+  timeout: 45_000,
+  expect: { timeout: 10_000 },
+  reporter: 'list',
+  use: {
+    baseURL: 'http://127.0.0.1:3002',
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+  },
+  projects: [
+    {
+      name: 'desktop',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 } },
+    },
+  ],
+  webServer: {
+    command: 'npm run start',
+    url: 'http://127.0.0.1:3002/api/health',
+    timeout: 30_000,
+    reuseExistingServer: false,
+    env: {
+      PORT: '3002',
+      DATABASE_URL: '',
+      SURPLUS_DATA_DIR: 'data/e2e',
+      PLAID_CLIENT_ID: '',
+      PLAID_SANDBOX_SECRET: '',
+      PLAID_PRODUCTION_SECRET: '',
+      PLAID_SANDBOX_ACCESS_TOKEN: '',
+      TOKEN_ENCRYPTION_KEY: '',
+      AUTH_PUBLIC_ORIGIN: 'http://127.0.0.1:3002',
+      JWT_SIGNING_KEY: '',
+      GOOGLE_CLIENT_ID: '',
+      GOOGLE_CLIENT_SECRET: '',
+      MICROSOFT_CLIENT_ID: '',
+      MICROSOFT_CLIENT_SECRET: '',
+      SMTP_HOST: '',
+      SMTP_USER: '',
+      SMTP_PASSWORD: '',
+      SMTP_FROM: '',
+    },
+  },
+});

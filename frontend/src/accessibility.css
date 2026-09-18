@@ -1,0 +1,175 @@
+/* Keep secondary text readable without changing the visual hierarchy. */
+@layer accessibility {
+  :root {
+    --muted: #64705e;
+  }
+  .eyebrow,
+  .section-divider .eyebrow,
+  .card-kicker {
+    color: #627455;
+  }
+  .field-note,
+  .section-title p,
+  .stat-card > small,
+  .next-step-card > p,
+  .next-step-impact > span,
+  .next-step-impact small,
+  .spending-total > span,
+  .category-list > div,
+  .chart-caption,
+  .goal-preview > p,
+  .goal-preview-value > span,
+  .recent-row > div > span,
+  .date-reminder p,
+  .readiness-reminder p,
+  .app-footer,
+  .field > small,
+  .money-input > small,
+  .opportunity-meta,
+  .opportunity-type,
+  .opportunity-card > .provider,
+  .budget-caption,
+  .goal-metrics > div,
+  .goal-balance > span,
+  .sample-disclosure,
+  .onboarding-description,
+  .institution-card small,
+  .onboarding-aside p,
+  .aside-summary > div,
+  .onboarding-actions > span,
+  .review-section small,
+  .onboarding-progress > div:first-child,
+  .welcome-nav-note,
+  .privacy-line,
+  .welcome-footer,
+  .topbar-date,
+  .merchant-cell small,
+  .mini-stats small,
+  .savings-hero p,
+  .savings-hero > div:last-child span,
+  .readiness-hero .small,
+  .profile-details small,
+  .accounts-list > div > div > small,
+  .calculator-value > span,
+  .match-reasons > small,
+  .insight-card > small {
+    color: #596b4f;
+  }
+  .stat-card > small,
+  .field-note,
+  .recent-row > div > span,
+  .category-list > div,
+  .category-list strong,
+  .date-reminder p,
+  .readiness-reminder p,
+  .goal-preview > p,
+  .next-step-card > p,
+  .opportunity-meta,
+  .opportunity-card > .provider,
+  .budget-caption,
+  .goal-metrics > div,
+  .merchant-cell small,
+  .match-reasons > small,
+  .insight-card > small {
+    font-size: 11px;
+  }
+  .stat-card > span,
+  .hero-label,
+  .hero-middle p,
+  .funding-progress > div:first-child {
+    font-size: 11px;
+  }
+  .nav-item {
+    font-size: 13px;
+  }
+  .sidebar-bottom > .nav-item {
+    font-size: 11px;
+  }
+  .onboarding-aside > .badge {
+    color: #677f52;
+  }
+  .hero-middle p,
+  .hero-label,
+  .hero-footer,
+  .funding-progress > div:first-child {
+    color: #bacdb8;
+  }
+  .onboarding-form:focus,
+  .welcome-main:focus {
+    outline: none;
+  }
+  .welcome-copy > p,
+  .floating-note small,
+  .welcome-benefits > div > span,
+  .art-title,
+  .art-caption {
+    color: #607151;
+  }
+  .art-step > span {
+    color: #405533;
+  }
+  .step-three > span {
+    color: #ffffff;
+  }
+  .tmu-note,
+  .onboarding-aside h2 em {
+    color: #60794c;
+  }
+  .onboarding-header > span,
+  .onboarding-progress strong,
+  .aside-school,
+  .onboarding-aside > .badge,
+  .onboarding-aside p,
+  .stat-card > span,
+  .next-step-card .card-kicker,
+  .section-divider > span,
+  .demo-ribbon,
+  .topbar-left > span {
+    color: #596b4f;
+  }
+  .workspace-label small,
+  .nav-label,
+  .sidebar-note button,
+  .user-profile small {
+    color: #a3bba0;
+  }
+  .badge.amber {
+    color: #795321;
+  }
+  .badge.neutral {
+    color: #5b674f;
+  }
+  .hero-top .badge {
+    color: #dce1b7;
+  }
+  .opportunity-highlight .card-kicker,
+  .opportunity-highlight .badge,
+  .opportunity-highlight p,
+  .opportunity-highlight-bottom span {
+    color: #74603c;
+  }
+  @media (max-width: 620px) {
+    .hero-number {
+      font-size: 60px;
+    }
+    .hero-sprout {
+      width: 50px;
+      height: 50px;
+    }
+    .hero-sprout > span {
+      font-size: 50px;
+    }
+    .stat-card {
+      padding: 17px 13px;
+    }
+    .stat-card > span {
+      font-size: 10px;
+    }
+    .stat-card > small {
+      font-size: 10px;
+    }
+    .stat-card > strong {
+      font-size: 26px;
+    }
+  }
+}

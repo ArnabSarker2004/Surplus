@@ -1,0 +1,9 @@
+node_modules
+dist
+data
+package-lock.json
+docs/product-brief.md
+artifacts
+playwright-report
+test-results
+**/.venv/

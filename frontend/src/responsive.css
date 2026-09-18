@@ -1,0 +1,141 @@
+/* Keep intrinsic chart, text, and currency widths from stretching grid tracks. */
+.sidebar {
+  overflow-y: auto;
+}
+.table-scroll {
+  position: relative;
+  max-width: 100%;
+}
+.hero-middle > div:first-child {
+  min-width: 0;
+}
+.stat-card > small,
+.section-title p,
+.hero-middle p,
+.hero-label,
+.category-list,
+.chart-caption,
+.mini-stats small {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.stat-card > span {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.overview-hero-grid > *,
+.overview-middle > *,
+.overview-bottom > *,
+.possibility-grid > *,
+.scenario-grid > *,
+.stat-grid > *,
+.mini-stats > *,
+.page-head > *,
+.section-title > *,
+.review-section > div {
+  min-width: 0;
+}
+.chart-wrap {
+  min-width: 0;
+}
+.chart-caption,
+.section-title,
+.hero-top,
+.hero-footer {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.stat-card > strong,
+.mini-stats strong,
+.scenario-comparison strong,
+.hero-number,
+.goal-preview-value strong,
+.plan-summary strong {
+  overflow-wrap: anywhere;
+  white-space: normal;
+  font-variant-numeric: tabular-nums;
+}
+.stat-card > strong {
+  font-size: clamp(22px, 2.15vw, 30px);
+}
+.hero-number {
+  font-size: clamp(34px, 4.3vw, 64px);
+}
+.review-section strong,
+.user-profile strong,
+.bank-account-list strong,
+.category-list > div > span,
+.recent-row > div {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.bank-account-list > div > strong,
+.recent-amount {
+  flex-shrink: 0;
+}
+.button {
+  max-width: 100%;
+  white-space: normal;
+}
+.bank-dashboard-prompt {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 22px;
+  margin-bottom: 24px;
+  border: 1px solid #cdddc4;
+  background: #edf3e5;
+  border-radius: 14px;
+}
+.bank-dashboard-prompt p {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+@media (max-width: 1100px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .overview-middle,
+  .overview-bottom {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .lesson-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .page-head,
+  .bank-dashboard-prompt {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .page-head .button-row,
+  .topbar-right {
+    flex-wrap: wrap;
+  }
+  .hero-middle {
+    gap: 10px;
+  }
+  .hero-sprout {
+    display: none;
+  }
+  .scenario-comparison {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .scenario-comparison strong {
+    font-size: 30px;
+  }
+  .mini-stats.standalone {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bank-account-list > div {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chart-card {
+    padding: 18px 12px;
+  }
+}
