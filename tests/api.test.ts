@@ -8,7 +8,7 @@ import request from 'supertest';
 import { createApp } from '../backend/src/app';
 import { Store } from '../backend/src/infrastructure/sqlite-store';
 import { demoWorkspace, opportunities } from '../shared/demo';
-import { plan, scenarioPlan } from '../shared/finance';
+import { plan, scenarioPlan, normalize } from '../shared/finance';
 import type { AppState } from '../shared/schema';
 
 describe('local HTTP application', () => {
@@ -36,6 +36,26 @@ describe('local HTTP application', () => {
     assert.equal(a.body.transactions.length, b.body.transactions.length);
     assert.ok(a.body.transactions.length > 200);
     assert.equal(a.body.workspace.source, 'demo');
+  });
+  it('persists reviewed cash allocations through reload and export and rejects over-allocation', async () => {
+    await client.post('/api/demo').send({}).expect(200);
+    const w = demoWorkspace();
+    w.cashAllocations![0] = {
+      accountId: 'demo-chequing',
+      own: 825.4,
+      loans: 1800,
+      education: 3000,
+      reviewedBalance: 5625.4,
+    };
+    await client.put('/api/workspace').send(w).expect(200);
+    for (const path of ['/api/state', '/api/export']) {
+      const saved = await client.get(path).expect(200);
+      assert.deepEqual(saved.body.workspace.cashAllocations, w.cashAllocations);
+    }
+    w.cashAllocations![0].education = 9000;
+    await client.put('/api/workspace').send(w).expect(400);
+    const loaded = await client.get('/api/state').expect(200);
+    assert.equal(loaded.body.workspace.cashAllocations[0].education, 3000);
   });
   it('serves public resources and persists resource notes through reload and export', async () => {
     const catalog = await client.get('/api/resources').expect(200);
@@ -115,6 +135,104 @@ describe('local HTTP application', () => {
       (t: { merchant: string }) => t.merchant === tx.merchant,
     );
     assert.ok(sameMerchant.every((t: { category: string }) => t.category === 'Eating Out'));
+  });
+  it('detects historical education deposits on reads and exports and keeps corrections after reload', async () => {
+    await client.post('/api/demo').send({}).expect(200);
+    const resp = normalize(
+      {
+        transaction_id: 'education-resp',
+        account_id: 'demo-chequing',
+        date: '2026-09-08',
+        name: 'RBC RESP EDUCATIONAL ASSISTANCE PAYMENT',
+        amount: -1200,
+        iso_currency_code: 'CAD',
+        pending: false,
+      },
+      [],
+      undefined,
+      'demo',
+    );
+    store.transaction(() =>
+      store.set('transactions', [
+        { ...resp, category: 'Other', classification: 'Review', categoryOrigin: 'review' },
+      ]),
+    );
+    for (const path of ['/api/state', '/api/export']) {
+      const loaded = await client.get(path).expect(200);
+      assert.equal(loaded.body.transactions[0].category, 'RESP Funding');
+      assert.equal(loaded.body.transactions[0].cashFlow, 1200);
+      assert.equal(loaded.body.transactions[0].description, resp.description);
+      assert.equal(loaded.body.workspace.funding.length, demoWorkspace().funding.length);
+    }
+    await client
+      .patch('/api/transactions/education-resp')
+      .send({ category: 'Other', classification: 'Review', saveRule: false })
+      .expect(200);
+    const corrected = await client.get('/api/state').expect(200);
+    assert.equal(corrected.body.transactions[0].category, 'Other');
+    assert.equal(corrected.body.transactions[0].userCorrected, true);
+  });
+  it('persists a deposit purpose without changing bank amounts and rejects source rules on outflows', async () => {
+    await client.post('/api/demo').send({}).expect(200);
+    const deposit = normalize(
+      {
+        transaction_id: 'unclear-money',
+        account_id: 'demo-chequing',
+        date: '2026-09-08',
+        name: 'Unfamiliar company',
+        amount: -650,
+        pending: false,
+        iso_currency_code: 'CAD',
+      },
+      [],
+      undefined,
+      'demo',
+    );
+    store.transaction(() =>
+      store.set('transactions', [
+        deposit,
+        { ...deposit, id: 'outflow', cashFlow: -650, rawAmount: 650 },
+      ]),
+    );
+    await client
+      .patch('/api/transactions/unclear-money')
+      .send({ category: 'Other', depositPurpose: 'education', saveRule: false })
+      .expect(200);
+    for (const path of ['/api/state', '/api/export']) {
+      const saved = await client.get(path).expect(200);
+      assert.equal(saved.body.transactions[0].depositPurpose, 'education');
+      assert.equal(saved.body.transactions[0].category, 'Education Funding');
+      assert.equal(saved.body.transactions[0].cashFlow, 650);
+      assert.equal(saved.body.transactions[0].description, 'Unfamiliar company');
+    }
+    await client
+      .patch('/api/transactions/outflow')
+      .send({ category: 'Other', depositPurpose: 'personal', saveRule: false })
+      .expect(400);
+    for (const [purpose, category] of [
+      ['osap', 'OSAP Funding'],
+      ['resp', 'RESP Funding'],
+      ['grant', 'Grants and Bursaries'],
+      ['scholarship', 'Scholarships'],
+      ['loan', 'Other'],
+      ['personal', 'Other'],
+    ]) {
+      await client
+        .patch('/api/transactions/unclear-money')
+        .send({ category: 'Other', depositPurpose: purpose, saveRule: false })
+        .expect(200);
+      const reloaded = await client.get('/api/state').expect(200);
+      const transaction = reloaded.body.transactions.find(
+        (t: { id: string }) => t.id === 'unclear-money',
+      );
+      assert.equal(transaction.depositPurpose, purpose);
+      assert.equal(transaction.category, category);
+      assert.equal(transaction.cashFlow, 650);
+    }
+    await client
+      .patch('/api/transactions/unclear-money')
+      .send({ category: 'Other', depositPurpose: 'loan', saveRule: true })
+      .expect(400);
   });
   it('keeps imported data separate from Demo Mode', async () => {
     store.transaction(() => {

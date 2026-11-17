@@ -41,6 +41,28 @@ def test_cash_forecast_and_ranges_are_ordered_and_reproducible():
     assert all(p["low"] <= p["median"] <= p["high"] for p in a["timeline"])
 
 
+def test_personal_savings_exclude_unreviewed_loan_and_education_money_without_changing_cash_paths():
+    base = report()
+    protected = report(savingsEligibleCash=0)
+    assert protected["timeline"] == base["timeline"]
+    assert protected["liquidity"]["safeToSetAside"] == 0
+    assert protected["summary"]["safeWeeklyRoom"] == 0
+    owned = report(savingsEligibleCash=5000)
+    assert owned["liquidity"]["safeToSetAside"] == base["liquidity"]["safeToSetAside"]
+
+
+@pytest.mark.parametrize("kind", ["Repayable", "Non-repayable"])
+def test_future_school_funding_covers_bills_but_cannot_create_personal_savings(kind):
+    future = dict(id="fund", name="OSAP", amount=10000, date=str(NOW + timedelta(days=1)),
+                  frequency="Once", type=kind, status="Confirmed")
+    result = report(savingsEligibleCash=0, funding=[future],
+                    goals=[dict(id="goal", name="Personal savings", target=1000, current=0,
+                                date=str(NOW + timedelta(days=60)), priority="High")])
+    assert result["timeline"][-1]["median"] > 10000
+    assert result["liquidity"]["safeToSetAside"] == 0
+    assert result["goals"][0]["projectedAmount"] == 0
+
+
 def test_what_if_changes_do_not_change_the_baseline_or_early_horizon_paths():
     base = payload()
     for i, transaction in enumerate(base["transactions"]):
@@ -97,9 +119,10 @@ def test_manual_monthly_expense_replaces_category_model_not_double_counts():
     assert result["summary"]["spendingNext30"] == 600
 
 
-def test_historical_grants_and_received_funding_do_not_repeat():
+@pytest.mark.parametrize("category", ["Grants and Bursaries", "OSAP Funding", "RESP Funding", "Student Aid Funding"])
+def test_historical_grants_and_received_funding_do_not_repeat(category):
     base = payload()
-    base["transactions"].append(transaction("grant", NOW - timedelta(days=5), cash=9000, category="Grants and Bursaries", classification="Income"))
+    base["transactions"].append(transaction("grant", NOW - timedelta(days=5), cash=9000, category=category, classification="Income"))
     base["funding"] = [dict(id="received", name="Already received", amount=3000, date="2026-10-01", type="Non-repayable", status="Received", frequency="Once"), dict(id="applied", name="Pending grant", amount=5000, date="2026-10-01", type="Non-repayable", status="Applied", frequency="Once")]
     assert analyze(ForecastRequest.model_validate(base))["summary"]["incomeNext30"] == 0
 

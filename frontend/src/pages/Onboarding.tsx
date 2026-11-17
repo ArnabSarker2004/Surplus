@@ -778,8 +778,8 @@ export function Onboarding({
                           <li>Budget comparisons and savings estimates alongside your plan.</li>
                         </ul>
                         <p>
-                          Build private, local forecasts from your history in Forecasts & AI after
-                          setup. Models run only when you request a forecast.
+                          Explore your spending and future balance in Money outlook after setup.
+                          Models run only when you request a forecast.
                         </p>
                       </div>
                     </div>

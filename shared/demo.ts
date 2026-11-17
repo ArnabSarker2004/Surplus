@@ -1,4 +1,5 @@
 import { classify, round } from './finance';
+import { depositSource } from './deposits';
 import {
   emptyScenario,
   type Account,
@@ -105,7 +106,44 @@ export const demoAccounts: Account[] = [
   },
 ];
 export function demoWorkspace(): Workspace {
+  const deposits = demoTransactions().filter((t) => t.cashFlow > 0 && !t.pending);
+  const reviewedDeposits = (accountId: string) =>
+    deposits
+      .filter((t) => t.accountId === accountId)
+      .map((t) => {
+        const source = depositSource(t);
+        return {
+          id: t.id,
+          amount: t.cashFlow,
+          bucket:
+            source === 'salary' || source === 'personal'
+              ? ('own' as const)
+              : source === 'loan'
+                ? ('loans' as const)
+                : source === 'education'
+                  ? ('education' as const)
+                  : ('unassigned' as const),
+        };
+      });
   return {
+    cashAllocations: [
+      {
+        accountId: 'demo-chequing',
+        own: 1025.4,
+        loans: 1800,
+        education: 2800,
+        reviewedBalance: 5625.4,
+        reviewedDeposits: reviewedDeposits('demo-chequing'),
+      },
+      {
+        accountId: 'demo-savings',
+        own: 450,
+        loans: 0,
+        education: 0,
+        reviewedBalance: 450,
+        reviewedDeposits: reviewedDeposits('demo-savings'),
+      },
+    ],
     profile: {
       name: 'Alex',
       institution: 'Toronto Metropolitan University',
@@ -175,6 +213,10 @@ export function demoWorkspace(): Workspace {
         name: 'Part-time campus job',
         amount: 440,
         date: '2026-09-11',
+        endDate: '2026-12-18',
+        workKind: 'Campus job',
+        workStart: '2026-09-01',
+        workEnd: '2026-12-18',
         type: 'Earned',
         status: 'Expected',
         frequency: 'Biweekly',

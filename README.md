@@ -1,14 +1,227 @@
-﻿# Surplus
+# Surplus
 
 **Your semester, with room to grow.**
 
-Surplus is a locally runnable student financial planning app, initially designed around Toronto Metropolitan University. It connects semester funding, everyday spending, savings goals, and student opportunities in one explainable plan.
+Surplus is a student financial planning application that connects semester costs, funding, bank transactions, budgets, savings goals, and cash-flow forecasts. It helps students understand what money is available, what needs to be paid, and how a change in spending or work could affect the rest of the semester.
 
-The idea comes from discovering paid campus projects and Learning Zone stipends by chance while looking for ways to cover school costs. Surplus makes that connection visible: understand the gap, find a possible next step, and see how it could affect the semester.
+**React 19 · TypeScript · Node.js · Express · PostgreSQL / SQLite · Plaid · Python · FastAPI**
 
-## Run locally
+[Features](#key-features) · [How it works](#how-it-works) · [Architecture](#architecture) · [Getting started](#getting-started) · [Technical guide](docs/technical-guide.md)
 
-Requires Node.js **20.12 or newer**, npm, and Python **3.12** for financial forecasting.
+## At a glance
+
+| Question | Answer |
+| --- | --- |
+| Who is it for? | Students managing tuition, school funding, part-time/co-op income, everyday spending, and savings. The initial resource catalog focuses on Toronto Metropolitan University (TMU). |
+| What problem does it solve? | Connects the semester plan with everyday financial activity, making funding gaps and upcoming cash needs easier to understand. |
+| What can someone try? | A fictional student workspace with editable budgets, transactions, goals, and scenarios through the account-free demo. |
+| What makes it interesting technically? | Reliable bank-data synchronization, shared financial logic, authenticated account workspaces, PostgreSQL isolation, and locally evaluated Python forecasts. |
+| Does it require a bank or AI account? | No. Demo data and entered plans work without bank credentials. Personal forecasting runs locally; external merchant suggestions are optional. |
+| What is its current status? | A locally runnable full-stack application. Public hosting and production-scale operation are not established by this repository. |
+
+## Overview
+
+A student may receive a large funding deposit at the start of a term, earn wages every two weeks, and pay tuition before much of that income arrives. An account balance alone does not explain how much is available for everyday spending or whether the semester is covered.
+
+Surplus connects those pieces. Students enter expected costs and funding, review imported or demo transactions, set budgets and goals, and inspect an explained money outlook. Grants, loans, earned income, and pending applications remain distinct so the plan does not treat every deposit as disposable income.
+
+The idea came from discovering paid campus projects and Learning Zone stipends by chance while looking for ways to cover school costs. The app links financial planning with a sourced student resource hub so users can understand a gap and explore a possible next step.
+
+## Preview
+
+<details>
+<summary>View the desktop overview with fictional demo data</summary>
+
+![Surplus desktop overview showing a fictional student's semester gap, account breakdown, spending, and savings goals](docs/images/overview-demo.png)
+
+An existing application capture of the seeded Alex demo, using the fixed September 16, 2026 snapshot. Values are fictional examples, not measured user outcomes. Individual screens may evolve as development continues.
+
+</details>
+
+## Key features
+
+### Semester planning and student money
+
+- **Guided onboarding:** enter school details, semester costs, funding, goals, and preferences through a full or quick setup path. Browser drafts can be resumed.
+- **Semester funding plan:** separate confirmed/received funding, expected job income, pending applications, repayable loans, and non-repayable grants.
+- **Work schedules:** enter co-op, campus, part-time, and summer jobs with pay frequency and first/last paydays. Projected wages stop when the saved schedule ends.
+- **Funding review:** flag deposits as loans, OSAP, grants, scholarships, or RESP and distinguish personal money from education funding.
+- **Budgets and goals:** edit monthly category limits, track savings goals, inspect emergency coverage, and review a conservative safe-to-save estimate.
+- **What-if planning:** compare spending reductions, extra income, future expenses, and goal allocations without silently editing the base plan.
+
+### Banking and transaction review
+
+- **Optional Plaid connections:** connect supported Canadian institutions through Plaid Link, or use Sandbox test accounts and a student fixture.
+- **Transaction explorer:** search, filter by month/category/account/type, paginate records, and review pending transactions.
+- **Corrections that persist:** change merchant/category/classification fields and save rules for future imports from the same source.
+- **Merchant evidence and cleanup:** distinguish a business from its payment processor, retain original bank descriptions, and show correction evidence.
+- **Financial-data normalization:** convert bank amount conventions into consistent cash flow and avoid counting transfers or credit-card payments as additional spending.
+- **Sync lifecycle:** handle added, modified, and removed transactions; preserve corrections; stage paginated results before committing data and cursor together.
+
+### Money outlook and financial intelligence
+
+- **Cash-flow ranges:** combine entered obligations, pay schedules, recurring patterns, and variable spending forecasts.
+- **Student outlook:** explain tuition coverage, term-end cash, remaining job pay, and gaps between work terms.
+- **Goal timelines and liquidity:** compare competing savings goals and inspect short-term cash pressure without moving money.
+- **Spending behavior:** review recurring charges, unusual purchases, weekday patterns, and available bank-supplied timing/location evidence.
+- **Model transparency:** display training/validation history, model comparisons, assumptions, and reasons for falling back to a simple baseline.
+- **Forecast history:** save comparisons and collect future 7/30/90-day observations; the existence of the journal is not proof of achieved accuracy.
+- **Canadian card comparisons and education:** explain estimated rewards, fees, investing readiness, and hypothetical compound growth. TFSA room is entered manually.
+
+### Student resources and product experience
+
+- **TMU resource hub:** a curated catalog of 31 resources, including all 10 campus Zones, paid placement routes, awards, campus jobs, mentoring, and learning initiatives.
+- **Resource tracking:** search/filter, inspect source-review dates and published requirements, save notes/follow-up dates, open official links, and download known dates to a calendar.
+- **Clearly separated examples:** fictional opportunities demonstrate matching and funding scenarios without presenting invented listings as active opportunities.
+- **Responsive interface:** reusable editors, financial charts, keyboard controls, reduced-motion support, mobile navigation, and locally served fonts.
+- **Account controls:** local passwords, revocable sessions, optional Google/Microsoft/email-code sign-in, financial JSON export, and workspace deletion.
+
+## How it works
+
+### Try a complete student journey
+
+1. **Explore the demo:** open the fictional workspace with no login or bank credentials.
+2. **Review the semester:** inspect costs, funding, and the projected end balance.
+3. **Understand spending:** filter transactions, inspect categories, and correct an entry.
+4. **Try a change:** compare a spending reduction or additional income with the base plan.
+5. **Explore goals and resources:** review savings progress and student opportunities.
+6. **Save your own plan:** create an account and complete onboarding. Banking is optional.
+
+The public demo runs in browser memory and resets on reload. It includes nine months of reproducible CAD transactions and a labelled pre-generated Python forecast. A signed-in plan uses persistent storage; personal forecast requests use the Python service.
+
+### From a bank record to a useful insight
+
+```text
+Student consents through Plaid Link
+    → backend exchanges and encrypts the access token
+    → transaction pages are collected using a saved sync cursor
+    → amounts/categories are normalized and corrections are preserved
+    → transactions and the new cursor are committed together
+    → shared calculations update budgets and spending summaries
+    → selected financial inputs can feed a local Python forecast
+```
+
+A **sync cursor** is a bookmark indicating how far bank updates have been processed. Saving the bookmark with its data prevents the app from advancing past updates it has not saved. Failed sync retains previous data, and pagination mutations retry from the original cursor up to three attempts.
+
+### From a plan to a forecast
+
+```text
+Current financial snapshot + entered expenses/funding + selected options
+    → Express validates the request and selects financial inputs
+    → authenticated FastAPI service checks bounded input contracts
+    → Python separates scheduled events from variable activity
+    → candidate models are evaluated on later holdout weeks
+    → repeatable cash-flow simulations are assembled
+    → charts, explanations, and model details return to the app
+```
+
+A **holdout** is a later slice of history kept out of model training so it can be used to evaluate predictions. Surplus compares a recent-average baseline with Ridge regression and histogram gradient boosting. Learned models require enough history and at least 5% lower holdout error to replace the baseline; **5% is a selection threshold, not a reported improvement**.
+
+The engine produces 400 repeatable simulated paths and shows percentile ranges. These describe modeled scenarios, not guaranteed balances or calibrated success probabilities.
+
+## Architecture
+
+**In plain language:** React presents the plan, Express validates requests and manages accounts/banking, the database remembers financial records, and Python calculates the deeper money outlook. Shared TypeScript functions keep the app's everyday financial rules consistent.
+
+```mermaid
+flowchart TD
+    User[Student] --> UI[React and TypeScript interface]
+    UI <-->|Authenticated HTTP requests| API[Express API: sessions, validation, services]
+    UI --> Demo[Public demo: browser memory and sample report]
+    UI --> Shared[Shared financial calculations and contracts]
+    API --> Shared
+    API --> Repo[Workspace repositories]
+    Repo <--> SQL[(SQLite: one local owner)]
+    Repo <--> PG[(PostgreSQL: isolated user accounts)]
+    API <-->|Bank connection and transaction sync| Plaid[Plaid API]
+    API <-->|Internal authenticated request| Python[Python and FastAPI forecasting]
+    Python --> Models[Baseline, Ridge, gradient boosting, simulations]
+    Python --> CPI[Statistics Canada CPI data or cache]
+    Python -.->|Optional opt-in merchant suggestions| Groq[Groq API]
+```
+
+**Data boundaries:** bank credentials and encrypted access tokens stay on the server. Python receives selected financial fields rather than Plaid tokens. Optional Groq requests send eligible merchant descriptors for suggestions; core financial calculations and local forecasting do not require an external AI account.
+
+### Persistence modes
+
+| Mode | What it provides | Important boundary |
+| --- | --- | --- |
+| Public demo | Fictional editable workspace in browser memory | No login; resets on reload; sample forecast |
+| SQLite | One-owner local saved workspace | Default without `DATABASE_URL`; not a multi-user deployment mode |
+| PostgreSQL / Supabase PostgreSQL | Separate accounts and user-owned financial records | Custom backend authentication; Supabase Auth is not used |
+
+PostgreSQL operations use a restricted runtime role, transaction-scoped verified identity, forced **row-level security** (database rules limiting which user's records can be accessed), and per-workspace row locks. Forecast inference runs outside the database transaction so CPU-intensive analysis does not hold its row lock. See [database architecture](docs/database.md).
+
+## Tech stack
+
+| Layer | Technology | Purpose |
+| --- | --- | --- |
+| Interface | React 19, TypeScript, Vite | Typed screens, interactions, and frontend development/build tooling |
+| UI and visualization | Original CSS, Motion, Recharts, Lucide, Fontsource | Responsive layouts, motion, charts, icons, and locally served fonts |
+| API and contracts | Node.js, Express 5, Zod | Request handling, validation, and shared domain contracts |
+| Persistence | PostgreSQL through `pg`; SQLite through `sql.js` | Separate user accounts or one-owner local storage |
+| Banking | Plaid, react-plaid-link, AES-256-GCM | Bank connection, transaction updates, and access-token encryption |
+| Identity | JWT/revocable sessions, scrypt, OpenID Connect, Nodemailer | Passwords, provider sign-in, and one-time email codes |
+| Financial intelligence | Python 3.12, FastAPI, Pydantic, NumPy, scikit-learn | Bounded inputs, evaluated forecasts, and cash-flow simulations |
+| Optional data/enrichment | Statistics Canada CPI; opt-in Groq suggestions | Explicit price scenarios and merchant cleanup |
+| Verification | Node test runner, Supertest, pytest, Playwright, axe | Domain/API tests, Python tests, browser journeys, and accessibility checks |
+| Automation | GitHub Actions and project CLI scripts | CI, database migrations, config checks, Sandbox verification, service setup |
+
+## Engineering highlights
+
+| Work demonstrated | Source to explore |
+| --- | --- |
+| Staged cursor sync, retries, encrypted tokens, and correction preservation | [Plaid adapter](backend/src/integrations/plaid.ts), [bank service](backend/src/services/plaid-service.ts) |
+| Consistent cash-flow signs, transfer exclusions, and categorization precedence | [Financial domain](shared/finance/), [transaction service](backend/src/services/transaction-service.ts) |
+| Account isolation and serialized workspace updates | [PostgreSQL repository](backend/src/repositories/postgres-workspace.ts), [migrations](backend/migrations/) |
+| Cookie sessions, identity linking, and provider validation | [Authentication guide](docs/authentication.md), [identity integration](backend/src/integrations/identity-providers.ts) |
+| Chronological model selection and ledger-aware simulations | [Models](services/intelligence/app/models.py), [engine](services/intelligence/app/engine.py) |
+| Repeatable setup, local data import, and integration checks | [Scripts](scripts/), [CI workflow](.github/workflows/ci.yml) |
+
+## Project structure
+
+```text
+Surplus/
+├── frontend/src/
+│   ├── App.tsx                  App navigation and workspace orchestration
+│   ├── components/              Reusable controls, financial editors, charts
+│   ├── features/                Auth, banking, intelligence, resources, demo
+│   └── pages/                   Semester, transactions, budgets, goals, scenarios
+├── backend/
+│   ├── src/
+│   │   ├── app.ts               API composition and middleware
+│   │   ├── routes/              HTTP request validation and response adapters
+│   │   ├── services/            Banking, corrections, forecasting, authentication
+│   │   ├── repositories/        Workspace and resource persistence boundaries
+│   │   ├── infrastructure/      SQLite, PostgreSQL, migrations, passwords
+│   │   └── integrations/        Plaid, identity providers, mail, public data
+│   └── migrations/              Versioned database schema and isolation policies
+├── shared/
+│   ├── schema.ts                Shared validated financial data contracts
+│   ├── finance/                 Pure calculations reused across the application
+│   └── demo.ts                  Reproducible fictional student data
+├── services/intelligence/
+│   ├── app/                     FastAPI, models, simulations, student/goal analysis
+│   └── tests/                   Python financial and forecasting checks
+├── tests/                       Domain/API, browser, and PostgreSQL checks
+├── scripts/                     Setup, database, auth, banking, and import tools
+├── docs/                        Technical guides and methodology
+└── .github/workflows/           Continuous integration
+```
+
+**Start reading the code:** [shared/schema.ts](shared/schema.ts) → [financial calculations](shared/finance/) → [API composition](backend/src/app.ts) → [Plaid service](backend/src/services/plaid-service.ts) → [Python engine](services/intelligence/app/engine.py).
+
+## Getting started
+
+### Prerequisites
+
+- **Node.js 20.12 or newer** and npm.
+- **Python 3.12** for the forecasting service.
+- No bank credentials, external AI account, or hosted database for the local demo.
+
+### 1. Install and run
+
+From the repository root:
 
 ```sh
 npm ci
@@ -16,210 +229,102 @@ npm run intelligence:setup
 npm run dev
 ```
 
-Open **http://127.0.0.1:5173**, create your local owner account, and choose **Try the TMU demo**. Existing saved data is preserved during account setup. Demo Mode needs no bank credentials, AI service, or deployment. The Express API runs at `http://127.0.0.1:3001`. Use the same browser address when returning.
+The setup script creates a Python virtual environment and installs the locked dependencies. Development starts all three services:
 
-For a production frontend build served by the local API:
+| Service | Local address | Responsibility |
+| --- | --- | --- |
+| Frontend | `http://127.0.0.1:5173` | Browser interface |
+| Express API | `http://127.0.0.1:3001` | Accounts, storage, bank requests |
+| Python service | `http://127.0.0.1:8001` | Financial forecasting |
 
-```sh
-npm run build
-npm start
-```
+### 2. Try the product
 
-Then open **http://127.0.0.1:3001**. Stop the development API first; both use port 3001. The API remains bound to localhost; public deployment is a separate setup.
+Open **http://127.0.0.1:5173** and select **Try demo**. Review the semester plan, edit a budget, inspect transactions, and compare a scenario. To keep your own plan, create an account and complete onboarding.
 
-## Connect PostgreSQL / Supabase
+### 3. Enable optional integrations
 
-Save the PostgreSQL connection URI in the server `.env` as `DATABASE_URL`, then run:
+Copy `.env.example` to `.env` only if you need configuration changes, preserving any existing settings. All secrets belong on the server, never in `VITE_*` variables.
 
-```sh
-npm run db:check
-npm run db:migrate
-npm run dev
-```
+| Configuration | Enables | Required for the public demo? |
+| --- | --- | --- |
+| `DATABASE_URL` | PostgreSQL accounts and persistence; run `npm run db:migrate` | No |
+| `PLAID_CLIENT_ID` + `PLAID_SANDBOX_SECRET` | Sandbox bank connection | No |
+| `PLAID_CLIENT_ID` + `PLAID_PRODUCTION_SECRET` | Supported live Canadian bank connections | No |
+| Google/Microsoft credentials or SMTP settings | Provider sign-in or email codes | No |
+| `GROQ_API_KEY` plus in-app opt-in | Suggestions for unfamiliar merchant descriptors | No |
+| `INTELLIGENCE_SERVICE_URL` / `INTELLIGENCE_SERVICE_TOKEN` | Override the internal Python endpoint/token | No; local defaults/key generation are supported |
 
-Use **Create account** on the login page. Each account gets its own saved plan and Plaid connection. Supabase supplies PostgreSQL; authentication remains in this backend. The Supabase Data API can remain disabled. To bring an existing local plan into your account, follow [the guarded import procedure](docs/database.md#import-your-existing-local-plan).
+Use one consistent browser address. If copying `.env.example`, its `AUTH_PUBLIC_ORIGIN` uses `http://localhost:5173`; set it to the exact address you use, such as `http://127.0.0.1:5173`, or consistently use the configured localhost origin. Provider callbacks must match that origin.
 
-## What works
+See the [complete environment and setup reference](docs/technical-guide.md), [database guide](docs/database.md), and [live banking guide](docs/live-banking-setup.md).
 
-- A public landing page introduces Surplus with **Log in**, **Sign up**, and **Try demo** entry points. The account-free demo opens a complete fictional student workspace with editable budgets, transactions, goals, and scenarios. It runs in memory, makes no private workspace API calls, and resets on reload. Open `/#home` to view the landing page while signed in.
-- A polished, responsive login with JWT sessions, local passwords, configurable Google/Microsoft sign-in and one-time email codes. Connect additional methods in Settings. Visible **Log out** controls revoke the session, clear private views across tabs, and preserve saved plans. See [Google/Microsoft activation](docs/social-login-setup.md) and [authentication](docs/authentication.md).
-- Original warm, responsive interface with local fonts, keyboard controls, reduced-motion support, and a mobile navigation drawer.
-- Nine-step onboarding, or a six-step quick path: dropdown presets, editable amounts, an optional dedicated Plaid bank-connection step, and review. Drafts persist in the browser; completed plans persist in PostgreSQL when configured, or local SQLite otherwise.
-- Semester costs, confirmed funding, expected employment, grants versus loans, pending applications, funding gaps, and monthly cash flow.
-- Demo with nine months of deterministic CAD transactions and no bank credentials required. A fixed **September 16, 2026** snapshot keeps the sample story reproducible.
-- Transaction search, month/category/account/type filters, pagination, manual category/classification corrections, and merchant rules.
-- Editable monthly budgets, explainable restaurant/coffee/subscription insights, recurring merchant detection, unusual purchase flags, weekly discretionary totals, and transparent spending trends.
-- A researched TMU resource hub covering 31 resources: all 10 on-campus Zones, paid placements, campus job routes, awards, events, mentoring, and learning initiatives. Search and filter, open official application routes, draft contact emails, save notes and follow-up dates, and download known dates to your calendar.
-- Source-review dates, clear waitlist/closed labels, and separate fixed stipends, hourly wages, variable funding and nonfinancial support. This is a researched snapshot; automatic website monitoring and scheduled notifications are not enabled. See [resource research and maintenance](docs/tmu-resources.md).
-- Clearly labelled fictional opportunity listings remain under **Demo examples**, with matching reasons, application status, scenarios, and award-to-funding demonstrations.
-- Saved what-if scenarios for spending reductions, extra income, future costs, opportunities, and goal allocations.
-- Savings goals, a conservative safe-to-save calculation, emergency coverage, and an explained investing-readiness assessment.
-- Investing education, a hypothetical compound-growth calculator, fee effects, and manually entered TFSA contribution room.
-- Canadian Production Plaid Link during setup and in Settings, plus Sandbox Link, existing-token import, dynamic test account creation, CAD student fixture creation, cursor-based transaction sync, deduplication, modifications, and removals.
-- Local JSON export and deletion controls. Secrets never appear in API responses or frontend code.
+### Available scripts
 
-## Architecture
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start API, frontend, and Python service |
+| `npm run intelligence:setup` | Create/install the local Python environment |
+| `npm run intelligence:dev` | Run the Python service separately |
+| `npm run check` | Type-check, lint, run Node/API tests, and build the frontend |
+| `npm run test:intelligence` | Run Python financial/forecasting tests |
+| `npm run test:e2e` | Run standard isolated browser journeys |
+| `npm run test:e2e:intelligence` | Run browser journeys with a real isolated Python service |
+| `npm run test:postgres` / `npm run test:e2e:postgres` | Run database integration/browser checks with dedicated test configuration |
+| `npm run db:check` / `npm run db:migrate` | Check database connectivity / apply migrations |
+| `npm run auth:check` / `npm run verify:plaid` | Inspect auth configuration / verify configured Sandbox workflows |
+| `npm run build` / `npm start` | Build the frontend / serve it through the local API |
 
-One repository and dependency lockfile, with explicit frontend, backend, and shared-domain boundaries:
+For the built app, open `http://127.0.0.1:3001`. Stop the development API first because it uses the same port. `npm start` does not start Python; run it alongside the API for personal forecasting. These commands serve locally rather than publicly deploying the app.
 
-```text
-frontend/
-  index.html
-  public/                         # Locally served assets
-  src/
-    App.tsx                       # Navigation and app state orchestration
-    main.tsx                      # React entry and error boundary
-    lib.tsx                       # API client and app context
-    components/                   # Reusable UI primitives and domain editors
-    features/resources/           # Resource discovery, cards, contacts and tracking
-    pages/                        # One file per feature page
-    styles.css                    # Original design system and responsive layouts
-    accessibility.css             # Readability and contrast refinements
-backend/
-  src/
-    index.ts                      # Environment, database and server bootstrap
-    app.ts                        # Composition root
-    catalog/                      # Reviewed public TMU resource records
-    routes/                       # HTTP validation and response adapters
-    services/                     # Transaction corrections and Plaid lifecycle
-    repositories/                 # Domain object persistence boundary
-    infrastructure/               # PostgreSQL connection/migrations; local SQLite fallback
-    integrations/                 # Plaid client, encryption, sync, test fixture
-    middleware/                   # Local security and sanitized errors
-shared/
-  schema.ts                       # Zod contracts and TypeScript domain models
-  resources.ts                    # Resource contracts, dates, progress and calendars
-  demo.ts                         # Reproducible student persona and sample data
-  finance.ts                      # Public domain exports
-  finance/                        # Pure, focused calculation modules
-    money.ts                      # Dates, recurrence, rounding, CAD formatting
-    planning.ts                   # Funding, costs, monthly timeline
-    categorization.ts             # Student mappings and classifications
-    transactions.ts               # Normalization and analytics
-    opportunities.ts              # Explainable matching
-    scenarios.ts                  # Hypothetical plan effects
-    savings.ts                    # Safe-to-save and trend forecast
-    readiness.ts                  # Investing education prerequisites
-    investment.ts                 # Compound-growth illustration
-    insights.ts                   # Deterministic spending observations
-tests/
-  finance.test.ts                 # Financial invariants and edge cases
-  plaid.test.ts                   # Pagination, corrections, encryption
-  api.test.ts                     # Persistence, validation, security, workflows
-  resources.test.ts               # Source integrity, freshness, dates and calendars
-  e2e/                           # Browser journeys and accessibility checks
-docs/
-  architecture.md
-  tmu-resources.md                # Research sources, curation rules and maintenance
-  product-brief.md                # Original brief, preserved verbatim
-```
+## API reference
 
-React pages call typed HTTP helpers. Routes validate requests with Zod and delegate to services/repositories. Both frontend and backend import the same pure domain functions. The shared domain has no dependency on React, Express, SQLite, or network access.
+The browser uses an authenticated HTTP API. The Python service is internal and separately authenticated.
 
-**Stack:** React, TypeScript, Vite, Express, Zod, PostgreSQL through pg, SQLite through sql.js, Motion, Recharts, Lucide, native HTML form controls and dialogs. Node's built-in test runner, Supertest, Playwright, and axe provide verification. DM Sans and Instrument Serif are served locally through Fontsource under their SIL Open Font Licenses.
+| Method | Main endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/api/health`, `/api/auth/session` | Health response / session state |
+| POST | `/api/auth/register`, `/api/auth/login`, `/api/auth/logout` | Account/session lifecycle |
+| GET | `/api/state`, `/api/resources` | Private workspace state / public resource catalog |
+| PUT | `/api/workspace` | Save a validated financial plan |
+| PATCH | `/api/transactions/:id` | Correct a transaction and optionally save a rule |
+| GET / POST | `/api/transactions/enrichment` | Inspect / request merchant cleanup |
+| POST | `/api/plaid/link-token`, `/api/plaid/exchange`, `/api/plaid/sync` | Connect and synchronize banking |
+| DELETE | `/api/plaid/item` | Revoke/remove a bank connection |
+| POST | `/api/intelligence/forecast` | Request a forecast and record its history |
+| GET / DELETE | `/api/export`, `/api/data` | Export financial state / delete workspace data |
 
-Set `DATABASE_URL` to use PostgreSQL with separate accounts, user-owned tables, custom JWT authentication, transaction locks, and row-level security. Omit it for the original single-owner SQLite workspace. Both modes use the same domain services. See [database setup and importing local data](docs/database.md). Existing local data is preserved when switching modes and is never automatically assigned to a new signup.
+[Full API and service reference](docs/technical-guide.md#api-and-service-boundaries) includes provider flows and mode-specific behavior. Python exposes `/health`, `/v1/forecast`, and `/v1/enrich`; private endpoints require an internal service token.
 
-## Plaid bank connections
+## Testing and project status
 
-1. Copy `.env.example` to `.env` if you do not already have one.
-2. Get your client ID and Sandbox secret from the [Plaid developer dashboard](https://dashboard.plaid.com/developers/keys).
-3. Set `PLAID_CLIENT_ID` and `PLAID_SANDBOX_SECRET` in `.env`.
-4. Optionally set `PLAID_SANDBOX_ACCESS_TOKEN` for an existing Sandbox item.
-5. Restart the API, then open **Settings & connections**.
+The repository includes financial-domain tests, API tests, controlled bank/identity integration tests, Python forecasting tests, PostgreSQL isolation tests, browser journeys, and automated accessibility checks. The [CI workflow](.github/workflows/ci.yml) runs application checks, Python tests, and standard/intelligence browser suites on pushes and pull requests.
 
-| Variable                     | Purpose                                                      |
-| ---------------------------- | ------------------------------------------------------------ |
-| `PLAID_CLIENT_ID`            | Server-side Plaid client ID                                  |
-| `PLAID_SANDBOX_SECRET`       | Server-side Sandbox secret                                   |
-| `PLAID_SANDBOX_ACCESS_TOKEN` | Optional existing Sandbox item                               |
-| `TOKEN_ENCRYPTION_KEY`       | Optional 64 hex characters / 32 bytes for AES-256-GCM        |
-| `PORT`                       | API port; defaults to 3001 (Vite proxy expects 3001)         |
-| `SURPLUS_DATA_DIR`           | Optional database/key directory; defaults to ignored `data/` |
+**Last recorded local run: November 16, 2026 — 158 Node/API tests passed and 90 Python tests passed.** Python reported two dependency deprecation warnings. That audit did not execute browser/PostgreSQL suites, builds, lint/type checks, or real bank/provider integrations. These are dated results rather than a claim that all current checks pass.
 
-When no encryption key is configured, the server generates `data/.token-key`. Access tokens are encrypted in the active database with AES-256-GCM. Keep the key alongside the database for local restart; losing it requires reconnecting your bank. `.env`, the database, caches, keys, and test artifacts are ignored by Git.
+### Current limitations
 
-Set `PLAID_PRODUCTION_SECRET` to enable **Connect my bank** during setup and in Settings. The server uses the matching Production or Sandbox endpoint and persists that environment with each encrypted connection. Link requests Transactions, Canadian institutions, and up to 365 days of available history. Users authenticate and consent in Plaid or their bank; Surplus does not collect card numbers, CVVs, or banking passwords. See [live banking setup](docs/live-banking-setup.md). For the dynamic test account, the server uses First Platypus Bank (`ins_109508`), `user_transactions_dynamic`, and `pass_good`. The CAD student fixture uses Plaid's `user_custom` configuration with locally generated sample transactions.
+- **Local operation:** the API binds to loopback. Public deployment requires separate hosting, proxy, operational, and privacy/security work.
+- **Background synchronization:** opted-in live workspaces can poll every six hours while the backend is open. Public webhooks and a durable hosted scheduler are not implemented.
+- **Financial estimates:** missing accounts, stale balances, incomplete history, or inaccurate inputs change results. CAD totals exclude unsupported currencies rather than inventing exchange rates.
+- **Forecast interpretation:** simulated ranges and deadline-readiness shares are exploratory; measured accuracy, user savings, performance, and adoption are not established.
+- **Resources and AI:** the TMU catalog is a reviewed snapshot, not automatic website monitoring. Forecast explanations are grounded in calculated results; optional merchant suggestions may be wrong and can be corrected.
+- **Scope:** Surplus does not execute payments, trades, or transfers, calculate official TFSA room, or guarantee financial outcomes.
 
-Click **Sync transactions** after connecting. If history is still preparing, sync again later. Connected bank data powers transaction categories, spending summaries, and calculation-based insights without adding bank deposits to planned semester funding. Live, Demo, and Sandbox data stay separate. The Forecasts & AI page additionally fits and validates per-workspace Python models on request; see [financial intelligence](docs/financial-intelligence.md). The dynamic institution may return USD accounts; those appear with their currency and are excluded from CAD totals. No exchange rate is invented.
+## Documentation
 
-All sync pages are staged before committing data and cursor together. A pagination mutation retries from the original cursor, up to three attempts. Merchant corrections survive modified transactions and pending-to-posted replacement. Failed sync retains previous data. This local MVP uses manual sync rather than public webhooks.
+| Guide | What it explains |
+| --- | --- |
+| [Technical guide](docs/technical-guide.md) | Detailed setup, API, formulas, bank-sync behavior, tests, and limitations |
+| [Database](docs/database.md) | PostgreSQL accounts, migrations, isolation, and guarded local imports |
+| [Authentication](docs/authentication.md) | Sessions, provider identities, email codes, and security boundaries |
+| [Financial intelligence](docs/financial-intelligence.md) | Model evaluation, simulation assumptions, privacy, and verification |
+| [Behavioral intelligence](docs/behavioral-intelligence.md) | Purchase patterns, CPI scenarios, and liquidity methods |
+| [Student money](docs/student-money.md) | Deposit classification and personal versus education funds |
+| [Transaction enrichment](docs/transaction-enrichment.md) | Merchant evidence and persistent corrections |
+| [Optional Groq cleanup](docs/groq-merchant-enrichment.md) | Configuration, opt-in, fallback, and merchant suggestions |
+| [TMU resources](docs/tmu-resources.md) | Research sources, curation, tracking, and maintenance |
+| [Repository description](docs/repository-about.md) | GitHub About text, topics, and a plain-language project summary |
 
-Sources: [Plaid Transactions](https://plaid.com/docs/transactions/), [sync API](https://plaid.com/docs/api/products/transactions/), [custom Sandbox data](https://plaid.com/docs/sandbox/user-custom/).
+## License
 
-## Calculation rules
-
-Money is rounded to cents. Recurrence uses actual scheduled dates inside the semester, with monthly dates clamped to the last valid day of shorter months.
-
-```text
-planned funding = confirmed/received sources
-                + expected employment
-                + awarded opportunities paid inside the semester
-ending balance  = planned funding - planned semester costs
-funding gap     = max(0, -ending balance)
-target gap      = max(0, desired minimum balance - ending balance)
-monthly action  = target gap / remaining monthly planning periods
-```
-
-Pending grants, bursaries, and applications do not count as confirmed. Expected employment is included in projections and labelled separately. Repayable funding remains distinct from grants. An opportunity already Awarded is never added again by a scenario.
-
-Bank analytics normalize Plaid's positive expense amounts to negative cash flow. Pending and non-CAD transactions are excluded from CAD totals. Transfers, investment contributions, and credit-card payments are excluded from income/spending; refunds reduce their spending category. Loan proceeds count as cash inflow, **not income earned**. The UI labels their inclusion.
-
-Category priority: explicit user correction → same-source merchant rule → known student merchant → high-confidence Plaid category → Other / Review. Raw amounts and Plaid categories remain intact. Review uncertain deposits, reimbursements, and cash withdrawals manually.
-
-```text
-safe to save = max(0,
-  spendable chequing cash + confirmed/expected earned income in 30 days
-  - planned payments in 30 days - outstanding card balances
-  - desired minimum balance - unresolved semester gap)
-```
-
-This deliberately conservative estimate reserves upcoming bills as well as the semester gap. Emergency savings and investments are not treated as available spending cash. Manually entered goal balances do not automatically move money or reconcile accounts.
-
-The trend illustration uses the previous three complete months of net cash flow, excluding irregular school funding, multiplied by remaining monthly periods. New tuition bills can make that trend misleading, so it is displayed with that limitation. The entered semester budget remains the primary forecast.
-
-Scenario changes apply to the current and remaining semester months. One-time amounts apply to the current month; opportunities use their sample payment date. Moving funds to a goal reduces available semester cash without creating income or spending. Scenarios are saved separately and never silently change the base plan.
-
-In **Demo examples**, opportunity scores combine hard eligibility checks, time availability, program, skills, interests, and selected types. A conflict caps the score; reasons and missing information are visible. These fictional examples demonstrate financial scenarios. The real TMU resource directory instead shows published requirements, limited profile checks, source dates and provider contacts; it does not claim admission probabilities or automatically count potential payments as income.
-
-Investing readiness checks semester coverage, high-interest debt, emergency savings, income stability, time horizon, and comfort with losses. Surplus may prioritize keeping money liquid over investing. The calculator assumes a constant annual return less fees with month-end contributions; it ignores tax, inflation, and market variability. Negative returns are supported. No individual security or portfolio is recommended.
-
-TFSA contribution room must be entered manually. The app links to [CRA withdrawal and recontribution guidance](https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/tax-free-savings-account/withdraw.html); it does not calculate official room or determine eligibility.
-
-## Checks
-
-```sh
-npm run typecheck
-npm run lint
-npm test
-npm run build
-npx playwright install chromium
-npm run test:e2e
-```
-
-`npm run check` runs type checking, lint, unit/API tests, and the production build. Browser tests use a separate local API on port 3002 and an isolated database in `data/e2e`. The standard browser suite explicitly disables PostgreSQL. They do not need Plaid credentials and do not overwrite your workspace. Screenshots and failure traces are saved locally under ignored `artifacts/` and `test-results/`.
-
-Use `npm run format` for consistent source formatting.
-
-With Sandbox credentials configured, `npm run verify:plaid` tests the existing Sandbox item in an isolated in-memory repository, creates and tests a separate CAD student fixture, and removes only that newly created fixture from Plaid afterward. It never changes your saved workspace or logs credentials.
-
-## Security and limitations
-
-- SQLite supports local single-owner use; PostgreSQL supports isolated user workspaces. JWT authentication uses revocable sessions. The API binds to loopback and checks Host, Origin, Fetch Metadata and mutation content type. Google and Microsoft sign-in require app-level provider credentials. See [authentication boundaries](docs/authentication.md).
-- Configured Plaid connections import account and transaction data. The optional Python service performs private local forecasting. The app does not trade, transfer money or guarantee financial outcomes.
-- Sample tuition and opportunity amounts are not official TMU fees or listings. Verify real amounts, deadlines, and eligibility independently.
-- Monthly projections can miss an earlier intra-month cash shortfall. Future expenses and income must be entered accurately.
-- Manual classification is important: merchant descriptions and institution categories can be incomplete or wrong.
-- Use the in-app bank removal flow to revoke a connected Plaid item. Manually deleting database files does not revoke bank access or remove credentials from `.env`.
-- University names and initials identify institutions. Official artwork has not been bundled; the MVP uses accessible text identification.
-- No performance, adoption, forecast accuracy, or savings-improvement claims are made.
-
-Further work includes multi-currency forecasting, background bank synchronization, and a deployment privacy/security review.
-
-## Python forecasting service
-
-Install with `npm run intelligence:setup` (Python 3.12), then run `npm run dev` to start all three services. Open **Forecasts & AI** to build cash-flow ranges, tuition readiness, savings-goal timelines, recurring-bill detection, unusual-purchase reviews, and what-if projections from your current transaction history. No external AI account or paid API is needed. For an app already running, start the Python service with `npm run intelligence:dev`.
-
-Learned models compete against a baseline using future holdout weeks. Sparse histories stay on the baseline. Ranges and deadline readiness describe simulations, not guaranteed outcomes. See the [architecture, methodology, privacy, assumptions, and testing guide](docs/financial-intelligence.md).
-
-Overview now links directly to **Forecasts & AI**. The public demo includes a clearly labeled Python-generated sample report. Spending-based [Canadian card comparisons](docs/credit-card-comparisons.md) show estimated rewards after fees, category breakdowns, payment assumptions and official issuer links.
+No standalone project license file is currently included. Third-party packages, fonts, and other assets retain their respective licenses; locally served DM Sans and Instrument Serif fonts use the SIL Open Font License.

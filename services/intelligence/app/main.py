@@ -9,6 +9,7 @@ from .contracts import ForecastRequest
 from .engine import VERSION, analyze
 from .assistant import answers
 from .cards import compare_cards
+from .enrichment import EnrichmentRequest, enrich
 
 app = FastAPI(title="Surplus Financial Intelligence", version="1.0.0", docs_url=None, redoc_url=None, openapi_url=None)
 security = HTTPBearer(auto_error=False)
@@ -48,7 +49,12 @@ def forecast(request: ForecastRequest):
     try:
         report = analyze(request)
         report["assistant"] = answers(report)
-        report["creditCards"] = compare_cards(request)
+        report["creditCards"] = compare_cards(request, report["liquidity"])
         return report
     finally:
         capacity.release()
+
+
+@app.post("/v1/enrich", dependencies=[Depends(authorize)])
+def enrich_merchants(request: EnrichmentRequest):
+    return enrich(request)

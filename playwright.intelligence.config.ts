@@ -9,6 +9,7 @@ export default defineConfig({
   reporter: 'list',
   outputDir: 'artifacts/intelligence-browser-results',
   use: {
+    actionTimeout: 10_000,
     ...devices['Desktop Chrome'],
     viewport: { width: 1440, height: 1000 },
     baseURL: 'http://127.0.0.1:3004',
@@ -30,6 +31,7 @@ export default defineConfig({
       reuseExistingServer: false,
       env: {
         PORT: '3004',
+        ECONOMIC_DATA_OFFLINE: '1',
         DATABASE_URL: '',
         SURPLUS_DATA_DIR: 'data/intelligence-browser',
         INTELLIGENCE_SERVICE_TOKEN: token,

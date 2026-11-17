@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, FiniteFloat, model_validator
 
@@ -7,18 +7,37 @@ class Contract(BaseModel):
     model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
 
 
+class Location(Contract):
+    city: str | None = Field(default=None, max_length=100)
+    region: str | None = Field(default=None, max_length=100)
+    country: str | None = Field(default=None, max_length=100)
+
+
 class Transaction(Contract):
+    eventId: str | None = Field(default=None, max_length=160)
     id: str = Field(max_length=160)
     accountId: str = Field(max_length=160)
     date: date
     merchant: str = Field(max_length=250)
+    merchantKey: str | None = Field(default=None, max_length=420)
+    merchantSource: str = Field(default="description", max_length=30)
+    merchantConfidence: str = Field(default="UNKNOWN", max_length=20)
+    detailCategory: str | None = Field(default=None, max_length=120)
+    detailLabel: str | None = Field(default=None, max_length=160)
+    categoryOrigin: str = Field(default="unknown", max_length=20)
     cashFlow: FiniteFloat
     category: str = Field(max_length=100)
     classification: str = Field(max_length=40)
+    reviewRequired: bool = False
     currency: str = Field(max_length=12)
     pending: bool
     source: Literal["demo", "live", "sandbox", "manual"]
     habitTreatment: Literal["automatic", "routine", "optional"] = "automatic"
+    forecastTreatment: Literal["automatic", "one_off", "reimbursement"] = "automatic"
+    authorizedDate: date | None = None
+    authorizedAt: datetime | None = None
+    location: Location | None = None
+    paymentChannel: Literal["online", "in store", "other"] | None = None
 
 
 class Account(Contract):
@@ -30,6 +49,7 @@ class Account(Contract):
 
 
 class Expense(Contract):
+    accountId: str | None = Field(default=None, max_length=160)
     id: str = Field(max_length=160)
     name: str = Field(max_length=160)
     amount: float = Field(ge=0, le=10_000_000)
@@ -39,14 +59,34 @@ class Expense(Contract):
 
 
 class Funding(Contract):
+    accountId: str | None = Field(default=None, max_length=160)
     id: str = Field(max_length=160)
     name: str = Field(max_length=160)
     amount: float = Field(ge=0, le=10_000_000)
     date: date
     endDate: date | None = None
+    workKind: Literal['Co-op', 'Campus job', 'Part-time job', 'Summer job'] | None = None
+    workStart: date | None = None
+    workEnd: date | None = None
     type: Literal["Non-repayable", "Repayable", "Earned", "Personal"]
     status: Literal["Expected", "Applied", "Confirmed", "Received"]
     frequency: Literal["Once", "Weekly", "Biweekly", "Monthly"]
+
+    @model_validator(mode="after")
+    def work_dates_valid(self):
+        if self.endDate and self.endDate < self.date:
+            raise ValueError("Last payday before first payday")
+        if self.workStart and self.workEnd and self.workEnd < self.workStart:
+            raise ValueError("Work end before start")
+        if self.workStart and self.date < self.workStart:
+            raise ValueError("First payday before work starts")
+        return self
+
+
+class Semester(Contract):
+    name: str = Field(max_length=160)
+    start: date
+    end: date
 
 
 class Goal(Contract):
@@ -114,7 +154,26 @@ class Options(Contract):
     cardPreferences: CardPreferences = Field(default_factory=CardPreferences)
 
 
+class LifeEvent(Contract):
+    id: str = Field(max_length=160)
+    name: str = Field(max_length=160)
+    start: date
+    end: date
+    weeklyIncomeChange: float = Field(ge=-10000, le=10000)
+    weeklyExpenseChange: float = Field(ge=-10000, le=10000)
+
+    @model_validator(mode="after")
+    def dates_valid(self):
+        if self.end < self.start:
+            raise ValueError("End before start")
+        return self
+
+
 class ForecastRequest(Contract):
+    savingsEligibleCash: float | None = Field(default=None, ge=0, le=1_000_000_000)
+    semester: Semester | None = None
+    workScheduleConfirmed: bool = False
+    lifeEvents: list[LifeEvent] = Field(default_factory=list, max_length=30)
     asOf: date
     source: Literal["demo", "live", "sandbox", "manual"]
     syncedAt: str | None = Field(default=None, max_length=40)

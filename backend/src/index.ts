@@ -8,6 +8,8 @@ import { PostgresAuthService } from './services/postgres-auth-service';
 import { AuthRepository } from './repositories/auth-repository';
 import { PostgresWorkspace } from './repositories/postgres-workspace';
 import { postgresWorkspaceRoutes } from './routes/postgres-workspace-routes';
+import { WorkspaceRepository } from './repositories/workspace-repository';
+import { startBankBackground } from './services/bank-background';
 const dataDir = resolve(process.env.SURPLUS_DATA_DIR || 'data');
 const store = await Store.open(resolve(dataDir, 'surplus.sqlite'));
 const key = encryptionKey(dataDir);
@@ -35,6 +37,7 @@ const app = createApp(
     : undefined,
 );
 const port = Number(process.env.PORT || 3001);
+const stopBackground = startBankBackground(key, new WorkspaceRepository(store), pool);
 const server = app.listen(port, '127.0.0.1', () => {
   console.info(`Surplus API ready at http://127.0.0.1:${port}`);
   console.info(
@@ -43,6 +46,7 @@ const server = app.listen(port, '127.0.0.1', () => {
 });
 for (const signal of ['SIGINT', 'SIGTERM'] as const)
   process.once(signal, () => {
+    stopBackground();
     server.close(() => {
       void (async () => {
         await pool?.end();

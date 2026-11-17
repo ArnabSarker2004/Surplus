@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CreditCard, ExternalLink } from 'lucide-react';
 import type { CreditCardComparison } from '../../../../shared/intelligence';
 import { cad } from '../../../../shared/finance';
-import { Badge, Field, SectionTitle } from '../../components/ui';
+import { Badge, Field } from '../../components/ui';
 
 export function CreditCardMatches({ report }: { report: CreditCardComparison }) {
   const [kind, setKind] = useState('all');
@@ -12,30 +12,26 @@ export function CreditCardMatches({ report }: { report: CreditCardComparison }) 
   const cards = report.cards.filter(
     (card) => (kind === 'all' || card.kind === kind) && (fee !== 'free' || !card.annualFee),
   );
+  const bestNet =
+    report.enoughHistory && !report.stale
+      ? Math.max(...cards.flatMap((card) => (card.annualNet === null ? [] : [card.annualNet])))
+      : null;
   return (
     <section className="intelligence-section card-matches" aria-labelledby="card-matches-title">
-      <SectionTitle
-        title="A better fit for the way you spend"
-        subtitle="Compare four Canadian cards using your existing purchases. No extra spending needed."
-      />
       <h3 id="card-matches-title" className="sr-only">
         Credit card matches
       </h3>
       <div className="card card-match-context">
         <CreditCard size={23} />
         <div>
-          <strong>{cad(report.monthlyEligibleSpend)} in estimated monthly eligible spending</strong>
-          <p>
-            {report.observedDays} observed days · {cad(report.excludedOutflows)} of outflows
-            excluded from rewards · Terms reviewed {report.reviewedAt}
-          </p>
-          <p>
+          <strong>
             {report.paidInFull === 'no'
-              ? 'Focus on reducing interest first. Rewards can be outweighed by borrowing costs; no card is recommended here.'
+              ? 'Interest can outweigh rewards. Card recommendations are paused.'
               : report.paidInFull === 'unknown'
-                ? 'These comparisons assume you pay every statement in full. Confirm your payment habits in the card assumptions above to see a spending match.'
-                : 'Ordered by estimated annual rewards after the card fee. Eligibility and merchant acceptance still need checking.'}
-          </p>
+                ? 'Set your repayment preference in “Try a change” to see rankings.'
+                : 'Compared by yearly rewards after fees.'}
+          </strong>
+          <p>Terms reviewed {report.reviewedAt} · eligibility varies by card</p>
         </div>
       </div>
       <div className="intelligence-control-grid card-match-filters">
@@ -62,6 +58,27 @@ export function CreditCardMatches({ report }: { report: CreditCardComparison }) 
             ))}
           </select>
         </Field>
+      </div>
+      <div className="outlook-stat-grid card-comparison-stats">
+        <article className="outlook-stat-card">
+          <span className="stat-card-label">Eligible spending</span>
+          <strong className="stat-card-value">{cad(report.monthlyEligibleSpend)}</strong>
+          <small>Per month · {report.observedDays} observed days</small>
+        </article>
+        <article className="outlook-stat-card">
+          <span className="stat-card-label">Highest reward estimate</span>
+          <strong className="stat-card-value">
+            {bestNet !== null && Number.isFinite(bestNet) ? cad(bestNet) : '—'}
+          </strong>
+          <small>Per year after fees · before interest</small>
+        </article>
+        <article className="outlook-stat-card">
+          <span className="stat-card-label">No annual fee</span>
+          <strong className="stat-card-value">
+            {cards.filter((card) => card.annualFee === 0).length} cards
+          </strong>
+          <small>In this comparison</small>
+        </article>
       </div>
       {!cards.length && (
         <p className="inline-notice">
@@ -114,19 +131,19 @@ export function CreditCardMatches({ report }: { report: CreditCardComparison }) 
                   </div>
                 )}
             </dl>
-            <p>{card.terms}</p>
             {card.chosenCategories.length > 0 && (
               <p>
                 <strong>Suggested bonus categories:</strong> {card.chosenCategories.join(', ')}
               </p>
             )}
-            <ul>
-              {card.benefits.map((benefit) => (
-                <li key={benefit}>{benefit}</li>
-              ))}
-            </ul>
             <details>
               <summary>Calculation & eligibility</summary>
+              <p>{card.terms}</p>
+              <ul>
+                {card.benefits.map((benefit) => (
+                  <li key={benefit}>{benefit}</li>
+                ))}
+              </ul>
               <p>{card.eligibility}</p>
               {card.breakdown.map((row) => (
                 <div className="intelligence-list-item" key={row.category}>
@@ -161,6 +178,10 @@ export function CreditCardMatches({ report }: { report: CreditCardComparison }) 
         open={report.stale || !report.enoughHistory}
       >
         <summary>How card estimates work</summary>
+        <p>
+          {report.observedDays} observed days · {cad(report.excludedOutflows)} of outflows excluded
+          from rewards.
+        </p>
         <ul>
           {report.warnings.map((warning) => (
             <li key={warning}>{warning}</li>

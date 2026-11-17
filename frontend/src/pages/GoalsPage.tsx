@@ -23,11 +23,12 @@ import {
   TextLink,
 } from '../components/ui';
 import { uid, useApp } from '../lib';
+import { StudentMoney } from '../components/StudentMoney';
 
 export function GoalsPage() {
   const { w, state, save, busy, navigate } = useApp();
   const [goal, setGoal] = useState<Goal | null>(null);
-  const safe = safeToSave(w, state.accounts, state.opportunities);
+  const safe = safeToSave(w, state.accounts, state.opportunities, state.transactions);
   const hypothetical = scenarioPlan(w, state.opportunities);
   const ready = readiness(w, state.opportunities);
   const monthlyEssential = sum(
@@ -39,7 +40,7 @@ export function GoalsPage() {
       <PageHead
         eyebrow="SAVINGS GOALS"
         title="For your future self."
-        description="Whatever you’re working toward, start with a little room."
+        description="Build personal savings after protecting your school funding and upcoming costs."
         action={
           <Button
             onClick={() =>
@@ -59,6 +60,12 @@ export function GoalsPage() {
           </Button>
         }
       />
+      <div className="inline-notice">
+        See how your spending history and changing prices move your goal dates.
+        <Button variant="secondary" onClick={() => navigate('intelligence-goals')}>
+          View my goal outlook <ArrowRight size={16} />
+        </Button>
+      </div>
       <div className="savings-hero">
         <span className="circle-icon sage">
           <ShieldCheck size={28} />
@@ -68,7 +75,7 @@ export function GoalsPage() {
           <h2>{cad(safe.amount)}</h2>
           <p>
             {safe.amount
-              ? 'Estimated room after upcoming payments, card balances, and your minimum buffer.'
+              ? 'Personal money left after education reserves, loans, upcoming payments, and your buffer.'
               : 'Your semester needs this money first. Keeping it accessible is progress, too.'}
           </p>
         </div>
@@ -87,9 +94,11 @@ export function GoalsPage() {
         <div className="detail-list">
           {[
             ['Available chequing cash', safe.cash],
-            ['Confirmed / expected earned income in 30 days', safe.income],
+            ['Loan, education and unassigned money', -safe.protectedCash],
+            ['Expected earnings / confirmed personal money in 30 days', safe.income],
             ['Planned payments in 30 days', -safe.bills],
             ['Outstanding credit-card balances', -safe.cardBalance],
+            ['Saved goals held outside personal savings accounts', -safe.goalReserve],
             ['Minimum desired balance', -safe.buffer],
             ['Unresolved semester gap', -safe.gap],
           ].map(([label, amount]) => (
@@ -105,6 +114,7 @@ export function GoalsPage() {
           balances are manually tracked and do not transfer money.
         </p>
       </details>
+      <StudentMoney />
       <div className="goal-grid">
         {w.goals.map((g) => {
           const trend = forecast(w, state.transactions, g.current, g.target);

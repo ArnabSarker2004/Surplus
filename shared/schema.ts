@@ -1,9 +1,13 @@
 import { z } from 'zod';
 import { resourceProgressSchema } from './resources';
+import type { MerchantDetails } from './merchants';
 
 export const categories = [
   'Employment Income',
   'OSAP Funding',
+  'RESP Funding',
+  'Student Aid Funding',
+  'Education Funding',
   'Grants and Bursaries',
   'Scholarships',
   'Stipends and Opportunities',
@@ -65,7 +69,7 @@ export const profileSchema = z.object({
   horizonYears: z.number().min(0).max(50),
   riskComfort: z.enum(['Low', 'Medium', 'High']),
   priorities: z.array(text).max(20),
-  reduceCategories: z.array(categorySchema).max(23),
+  reduceCategories: z.array(categorySchema).max(categories.length),
   tfsaRoom: moneySchema.nullable(),
 });
 export const semesterSchema = z
@@ -90,9 +94,13 @@ export const fundingSchema = z.object({
   amount: moneySchema,
   date,
   endDate: date.optional(),
+  workKind: z.enum(['Co-op', 'Campus job', 'Part-time job', 'Summer job']).optional(),
+  workStart: date.optional(),
+  workEnd: date.optional(),
   type: z.enum(['Non-repayable', 'Repayable', 'Earned', 'Personal']),
   status: z.enum(['Expected', 'Applied', 'Confirmed', 'Received']),
   frequency: z.enum(['Once', 'Weekly', 'Biweekly', 'Monthly']),
+  accountId: z.string().max(160).nullable().optional(),
 });
 export const expenseSchema = z.object({
   id: text,
@@ -102,7 +110,26 @@ export const expenseSchema = z.object({
   category: categorySchema,
   frequency: z.enum(['Once', 'Monthly']),
   essential: z.boolean(),
+  accountId: z.string().max(160).nullable().optional(),
 });
+export const lifeEventSchema = z
+  .object({
+    id: text,
+    name: text,
+    start: date,
+    end: date,
+    weeklyIncomeChange: z.number().finite().min(-10000).max(10000),
+    weeklyExpenseChange: z.number().finite().min(-10000).max(10000),
+  })
+  .refine((v) => v.end >= v.start, 'End date must be on or after start date.');
+export const intelligenceSettingsSchema = z
+  .object({
+    autoSync: z.boolean().default(false),
+    groqEnrichment: z.boolean().optional(),
+    alerts: z.boolean().default(true),
+    dismissed: z.array(z.string().max(200)).max(100).default([]),
+  })
+  .strict();
 export const goalSchema = z.object({
   id: text,
   name: text,
@@ -151,12 +178,74 @@ export const workspaceSchema = z
     scenario: scenarioSchema,
     source: sourceSchema,
     onboarded: z.boolean(),
+    lifeEvents: z.array(lifeEventSchema).max(30).optional(),
+    intelligenceSettings: intelligenceSettingsSchema.optional(),
+    workScheduleConfirmed: z.boolean().optional(),
+    cashAllocations: z
+      .array(
+        z
+          .object({
+            accountId: text,
+            own: moneySchema,
+            loans: moneySchema,
+            education: moneySchema,
+            reviewedBalance: moneySchema,
+            reviewedDeposits: z
+              .array(
+                z
+                  .object({
+                    id: text,
+                    amount: moneySchema,
+                    bucket: z.enum(['own', 'loans', 'education', 'unassigned']),
+                  })
+                  .strict(),
+              )
+              .max(10000)
+              .optional(),
+          })
+          .strict()
+          .refine(
+            (v) => v.own + v.loans + v.education <= v.reviewedBalance + 0.001,
+            'Assigned money cannot exceed the reviewed account balance.',
+          ),
+      )
+      .max(100)
+      .optional(),
   })
   .superRefine((v, ctx) => {
+    const allocationIds = (v.cashAllocations || []).map((a) => a.accountId);
+    if (new Set(allocationIds).size !== allocationIds.length)
+      ctx.addIssue({
+        code: 'custom',
+        path: ['cashAllocations'],
+        message: 'Review each account only once.',
+      });
+    for (const [index, fund] of v.funding.entries()) {
+      if (fund.endDate && fund.endDate < fund.date)
+        ctx.addIssue({
+          code: 'custom',
+          path: ['funding', index, 'endDate'],
+          message: 'Last payday must be on or after the first payday.',
+        });
+      if (fund.workStart && fund.workEnd && fund.workEnd < fund.workStart)
+        ctx.addIssue({
+          code: 'custom',
+          path: ['funding', index, 'workEnd'],
+          message: 'Work must end on or after it starts.',
+        });
+      if (fund.workStart && fund.date < fund.workStart)
+        ctx.addIssue({
+          code: 'custom',
+          path: ['funding', index, 'date'],
+          message: 'First payday must be on or after work starts.',
+        });
+    }
     for (const key of ['funding', 'expenses', 'goals', 'budgets'] as const) {
       if (new Set(v[key].map((x) => x.id)).size !== v[key].length)
         ctx.addIssue({ code: 'custom', path: [key], message: 'IDs must be unique.' });
     }
+    if (v.lifeEvents && new Set(v.lifeEvents.map((e) => e.id)).size !== v.lifeEvents.length)
+      ctx.addIssue({ code: 'custom', path: ['lifeEvents'], message: 'IDs must be unique.' });
     if (new Set(v.budgets.map((x) => x.category)).size !== v.budgets.length)
       ctx.addIssue({ code: 'custom', path: ['budgets'], message: 'One budget per category.' });
   });
@@ -169,11 +258,45 @@ export type Scenario = z.infer<typeof scenarioSchema>;
 export type Classification =
   'Essential' | 'Flexible' | 'Discretionary' | 'Transfer' | 'Income' | 'Review';
 export interface Transaction {
+  depositPurpose?:
+    | 'salary'
+    | 'personal'
+    | 'education'
+    | 'loan'
+    | 'osap'
+    | 'resp'
+    | 'grant'
+    | 'scholarship'
+    | 'refund'
+    | 'transfer'
+    | 'unknown';
+  fundingCounterparty?: string | null;
+  bankTransactionId?: string;
   id: string;
   accountId: string;
   date: string;
   authorizedDate: string | null;
+  authorizedAt?: string | null;
+  location?: { city: string | null; region: string | null; country: string | null } | null;
+  paymentChannel?: 'online' | 'in store' | 'other' | null;
   merchant: string;
+  merchantDetails?: MerchantDetails;
+  merchantOverride?: string | null;
+  enrichment?: {
+    descriptorHash: string;
+    attempted?: boolean;
+    externalEligible?: boolean;
+    cleaned: string;
+    merchant: string | null;
+    category: Category | null;
+    method: 'local' | 'groq' | 'unresolved';
+    model: string | null;
+    updatedAt: string;
+  };
+  merchantCorrected?: boolean;
+  categoryOrigin?: 'user' | 'rule' | 'merchant' | 'plaid' | 'review' | 'enrichment' | 'funding';
+  detailCategory?: string | null;
+  detailCategoryCorrected?: boolean;
   description: string;
   rawAmount: number;
   cashFlow: number;
@@ -186,6 +309,8 @@ export interface Transaction {
   classification: Classification;
   userCorrected: boolean;
   habitTreatment?: 'automatic' | 'routine' | 'optional';
+  forecastTreatment?: 'automatic' | 'one_off' | 'reimbursement';
+  splits?: { category: Category; amount: number }[];
   source: Source;
 }
 export interface Account {
@@ -194,6 +319,9 @@ export interface Account {
   type: 'depository' | 'credit' | 'investment' | 'loan' | 'other';
   subtype: string;
   balance: number;
+  balanceKnown?: boolean;
+  available?: number | null;
+  balanceObservedAt?: string | null;
   currency: string;
   source: Source;
 }
@@ -202,6 +330,9 @@ export interface MerchantRule {
   category: Category;
   classification: Classification;
   source: Source;
+  merchantKey?: string;
+  merchantOverride?: string | null;
+  detailCategory?: string | null;
 }
 export interface Opportunity {
   id: string;

@@ -5,6 +5,7 @@ import { Store } from '../backend/src/infrastructure/sqlite-store';
 import { WorkspaceRepository } from '../backend/src/repositories/workspace-repository';
 import { PlaidService } from '../backend/src/services/plaid-service';
 import { decrypt } from '../backend/src/integrations/plaid';
+import { syncIfDue } from '../backend/src/services/bank-background';
 
 describe('live banking environment and connection lifecycle', () => {
   let store: Store;
@@ -22,10 +23,13 @@ describe('live banking environment and connection lifecycle', () => {
     repo.seedDemo();
     service = new PlaidService(repo, key, 'fixture-user');
     saved = Object.fromEntries(
-      ['PLAID_CLIENT_ID', 'PLAID_SANDBOX_SECRET', 'PLAID_PRODUCTION_SECRET'].map((k) => [
-        k,
-        process.env[k],
-      ]),
+      [
+        'PLAID_CLIENT_ID',
+        'PLAID_SANDBOX_SECRET',
+        'PLAID_PRODUCTION_SECRET',
+        'PLAID_PLAN',
+        'PLAID_TRIAL_CONFIRMED_ON',
+      ].map((k) => [k, process.env[k]]),
     );
     Object.assign(process.env, {
       PLAID_CLIENT_ID: 'fixture-client',
@@ -39,12 +43,18 @@ describe('live banking environment and connection lifecycle', () => {
     globalThis.fetch = async (url, init) => {
       const path = new URL(String(url)).pathname;
       const body = JSON.parse(String(init?.body));
+      if (path === '/v1/enrich' && new URL(String(url)).hostname === '127.0.0.1') {
+        assert.deepEqual(Object.keys(body).sort(), ['allowExternal', 'items']);
+        assert.equal(body.allowExternal, false);
+        return new Response('{}', { status: 503 });
+      }
       calls.push({ url: String(url), body });
       let response: unknown;
       if (path === '/link/token/create') response = { link_token: 'link-production-fixture' };
       else if (path === '/item/public_token/exchange')
         response = { access_token: 'access-production-fixture', item_id: 'fixture-item' };
-      else if (path === '/accounts/get')
+      else if (path === '/transactions/refresh') response = { request_id: 'test-refresh' };
+      else if (path === '/accounts/get' || path === '/accounts/balance/get')
         response = {
           accounts: [
             {
@@ -67,6 +77,8 @@ describe('live banking environment and connection lifecycle', () => {
               transaction_id: 'live-transaction',
               account_id: 'live-account',
               date: '2026-09-18',
+              authorized_datetime: '2026-09-17T20:00:00-04:00',
+              location: { city: 'Toronto', region: 'ON', country: 'CA', address: 'Not retained' },
               name: 'Groceries',
               amount: 80,
               pending: false,
@@ -94,12 +106,47 @@ describe('live banking environment and connection lifecycle', () => {
       else process.env[key] = value;
     }
   });
+  it('gates extra production calls and enforces refresh cooldown without relinking', async () => {
+    await service.addConnection('exchange', 'public-production-fixture');
+    delete process.env.PLAID_PLAN;
+    const before = calls.length;
+    await assert.rejects(service.trialRefresh('balance'), { code: 'TRIAL_NOT_CONFIRMED' });
+    await assert.rejects(service.trialRefresh('transactions'), { code: 'TRIAL_NOT_CONFIRMED' });
+    assert.equal(calls.length, before);
+    process.env.PLAID_PLAN = 'trial';
+    process.env.PLAID_TRIAL_CONFIRMED_ON = new Date().toISOString().slice(0, 10);
+    await service.trialRefresh('balance');
+    assert.ok(calls.at(-1)?.url.endsWith('/accounts/balance/get'));
+    assert.equal(repo.state().accounts[0].balance, 1200);
+    await assert.rejects(service.trialRefresh('transactions'), { code: 'REFRESH_COOLDOWN' });
+    store.set('plaid', { ...service.item(), lastRefreshRequestedAt: null });
+    await service.trialRefresh('transactions');
+    assert.ok(calls.at(-1)?.url.endsWith('/transactions/refresh'));
+    assert.equal(calls.filter((c) => c.url.endsWith('/item/public_token/exchange')).length, 1);
+  });
+  it('backs off failed automatic sync and only retrieves existing Transactions updates', async () => {
+    await service.addConnection('exchange', 'public-production-fixture');
+    repo.save({
+      ...repo.workspace()!,
+      intelligenceSettings: { autoSync: true, alerts: true, dismissed: [] },
+    });
+    failSync = true;
+    assert.equal(await syncIfDue(repo, key), false);
+    const count = calls.length;
+    assert.equal(await syncIfDue(repo, key), false);
+    assert.equal(calls.length, count);
+    failSync = false;
+    const later = Date.now() + 7 * 3600000;
+    assert.equal(await syncIfDue(repo, key, undefined, later), true);
+    assert.ok(calls.slice(count).every((c) => /\/(transactions\/sync|accounts\/get)$/.test(c.url)));
+  });
   it('uses production credentials for Canadian Link and never falls back to Sandbox', async () => {
     await service.linkToken('production');
     assert.equal(calls[0].url, 'https://production.plaid.com/link/token/create');
     assert.equal(calls[0].body.secret, 'fixture-production');
     assert.deepEqual(calls[0].body.country_codes, ['CA']);
     assert.deepEqual(calls[0].body.products, ['transactions']);
+    assert.deepEqual(calls[0].body.transactions, { days_requested: 730 });
     assert.deepEqual(calls[0].body.user, { client_user_id: 'fixture-user' });
     delete process.env.PLAID_PRODUCTION_SECRET;
     await assert.rejects(service.linkToken('production'));
@@ -133,6 +180,38 @@ describe('live banking environment and connection lifecycle', () => {
     assert.equal(last.body.products, undefined);
     assert.equal(last.body.transactions, undefined);
     assert.match(last.url, /production/);
+  });
+  it('hydrates old transaction metadata once, preserves corrections and keeps the old cursor on failure', async () => {
+    await service.addConnection('exchange', 'public-production-fixture');
+    await service.sync();
+    repo.setHabitTreatment('live-transaction', 'routine');
+    store.set('plaid', {
+      ...service.item(),
+      cursor: 'old-cursor',
+      transactionMetadataVersion: 2,
+    });
+    failSync = true;
+    await assert.rejects(service.sync());
+    assert.equal(service.item()?.cursor, 'old-cursor');
+    assert.equal(service.item()?.transactionMetadataVersion, 2);
+    failSync = false;
+    await service.sync();
+    assert.equal(calls.filter((c) => c.url.endsWith('/transactions/sync')).at(-1)?.body.cursor, '');
+    assert.equal(service.item()?.transactionMetadataVersion, 3);
+    assert.deepEqual(
+      calls.filter((c) => c.url.endsWith('/transactions/sync')).at(-1)?.body.options,
+      { include_original_description: true },
+    );
+    const item = repo.state().transactions[0];
+    assert.equal(item.authorizedAt, '2026-09-17T20:00:00-04:00');
+    assert.deepEqual(item.location, { city: 'Toronto', region: 'ON', country: 'CA' });
+    assert.equal(item.habitTreatment, 'routine');
+    assert.equal(item.cashFlow, -80);
+    await service.sync();
+    assert.equal(
+      calls.filter((c) => c.url.endsWith('/transactions/sync')).at(-1)?.body.cursor,
+      'live-cursor',
+    );
   });
   it('retains data when revocation fails, then revokes live access before clearing imports', async () => {
     await service.addConnection('exchange', 'public-production-fixture');

@@ -55,13 +55,16 @@ test('public home leads to login, signup and an isolated interactive demo', asyn
   await page.getByRole('link', { name: 'Try the demo', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'A little clarity, Alex.' })).toBeVisible();
   const demoNav = page.getByRole('navigation', { name: 'Demo navigation' });
-  await page.getByRole('button', { name: 'Open forecasts & AI' }).click();
-  await page.getByRole('button', { name: 'Build my forecast' }).click();
+  await page.getByRole('button', { name: 'Open money outlook' }).click();
+  await expect(page.getByRole('heading', { name: 'Money in. Student life out.' })).toBeVisible();
+  await page.getByRole('button', { name: 'About these estimates', exact: true }).click();
   await expect(page.getByText('Python forecasting engine', { exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'The possible paths ahead' })).toBeVisible();
-  await expect(
-    page.getByRole('heading', { name: 'A better fit for the way you spend' }),
-  ).toBeVisible();
+  await page
+    .getByRole('navigation', { name: 'Money outlook sections' })
+    .getByRole('button', { name: 'Card options', exact: true })
+    .click();
+  await expect(page.getByRole('heading', { name: 'Card options', exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Credit card matches' })).toBeVisible();
   await demoNav.getByRole('button', { name: 'Savings goals', exact: true }).click();
   await page.getByRole('button', { name: 'Edit Emergency fund', exact: true }).click();
   await page.getByRole('spinbutton', { name: /Already saved/ }).fill('550');
@@ -70,14 +73,14 @@ test('public home leads to login, signup and an isolated interactive demo', asyn
   await demoNav.getByRole('button', { name: 'Transactions', exact: true }).click();
   await page.getByRole('textbox', { name: 'Search transactions' }).fill('Balzac');
   await page
-    .getByRole('button', { name: /Edit Balzac/ })
+    .getByRole('button', { name: /Details for Balzac/ })
     .first()
     .click();
   await page
     .getByRole('dialog')
     .getByRole('combobox', { name: 'Category', exact: true })
     .selectOption('Eating Out');
-  await page.getByRole('button', { name: 'Save category' }).click();
+  await page.getByRole('button', { name: 'Save transaction' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await demoNav.getByRole('button', { name: 'Savings goals', exact: true }).click();
   await expect(page.getByText('$550', { exact: true })).toBeVisible();

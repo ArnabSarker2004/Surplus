@@ -1,6 +1,6 @@
 import {
   AlertCircle,
-  BrainCircuit,
+  TrendingUp,
   ArrowLeftRight,
   ArrowUpRight,
   BookOpen,
@@ -52,7 +52,7 @@ const nav = [
   { id: 'semester', name: 'Semester plan', icon: CalendarDays },
   { id: 'transactions', name: 'Transactions', icon: ArrowLeftRight },
   { id: 'budgets', name: 'Budgets & insights', icon: Wallet },
-  { id: 'intelligence', name: 'Forecasts & AI', icon: BrainCircuit },
+  { id: 'intelligence', name: 'Money outlook', icon: TrendingUp },
   { id: 'opportunities', name: 'Opportunities', icon: Compass },
   { id: 'scenario', name: 'What-if planner', icon: SlidersHorizontal },
   { id: 'goals', name: 'Savings goals', icon: PiggyBank },
@@ -64,6 +64,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [page, setPage] = useState(window.location.hash.slice(1) || 'overview');
+  const activeNavPage = page === 'intelligence-goals' ? 'intelligence' : page;
   const [draft, setDraft] = useState<Workspace | null>(null);
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -235,8 +236,8 @@ export default function App() {
                     {i === 5 && <div className="nav-label second">A LITTLE FURTHER</div>}
                     <a
                       href={`#${item.id}`}
-                      className={`nav-item ${page === item.id ? 'active' : ''}`}
-                      aria-current={page === item.id ? 'page' : undefined}
+                      className={`nav-item ${activeNavPage === item.id ? 'active' : ''}`}
+                      aria-current={activeNavPage === item.id ? 'page' : undefined}
                       onClick={() => {
                         setMenu(false);
                         window.scrollTo({ top: 0 });
@@ -287,7 +288,7 @@ export default function App() {
                   </button>
                   <span>My space</span>
                   <span className="slash">/</span>
-                  <strong>{nav.find((n) => n.id === page)?.name ?? 'Settings'}</strong>
+                  <strong>{nav.find((n) => n.id === activeNavPage)?.name ?? 'Settings'}</strong>
                 </div>
                 <div className="topbar-right">
                   <LogoutButton />
@@ -330,13 +331,15 @@ export default function App() {
                       <TransactionsPage />
                     ) : page === 'budgets' ? (
                       <BudgetsPage />
-                    ) : page === 'intelligence' ? (
+                    ) : page === 'intelligence' || page === 'intelligence-goals' ? (
                       <Suspense
                         fallback={
                           <p role="status">Opening your financial intelligence workspace...</p>
                         }
                       >
-                        <IntelligencePage />
+                        <IntelligencePage
+                          initialTab={page === 'intelligence-goals' ? 'goals' : 'outlook'}
+                        />
                       </Suspense>
                     ) : page === 'opportunities' ? (
                       <OpportunitiesPage />

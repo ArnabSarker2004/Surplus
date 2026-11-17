@@ -47,7 +47,7 @@ export function LearnPage() {
       <PageHead
         eyebrow="LEARN & GROW"
         title="A little knowledge. A longer view."
-        description="Financial confidence grows one idea at a time."
+        description="Explore saving, investing, and growth with clear explanations and examples."
         action={<Badge tone="blue">Education, at your pace</Badge>}
       />
       <section className="readiness-hero">

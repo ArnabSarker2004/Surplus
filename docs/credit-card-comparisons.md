@@ -1,6 +1,6 @@
 # Spending-based Canadian card comparisons
 
-The **Forecasts & AI** page includes an explainable comparison of four Canadian cards. Python computes the results from the authenticated workspace's posted CAD purchases. These are rules-based rewards calculations, separate from the learned cash-flow models. No credit score, approval probability or product ownership is inferred from bank balances.
+The **Money outlook → Card options** view includes an explainable comparison of four Canadian cards. Python computes the results from the authenticated workspace's posted CAD purchases. These are rules-based rewards calculations, separate from the learned cash-flow models. No credit score, approval probability or product ownership is inferred from bank balances.
 
 `services/intelligence/app/card_catalog.py` contains the reviewed catalogue and issuer sources; `cards.py` contains the calculation. Terms were checked on **September 18, 2026**. After 90 days, the service marks terms stale and pauses the highest-value recommendation until a human reviews and updates the catalogue. The service does not silently fetch or trust product terms from third-party marketing sites.
 
@@ -18,5 +18,7 @@ Transfers, card repayments, cash-like categories, housing, tuition, pending/fore
 Users can filter fees/reward type, compare with a listed card they already own, confirm payment-in-full habits, enable Tangerine's third category, confirm recurring billing, and vary Amex acceptance. An unknown or carried balance suppresses the highest-value recommendation. The comparison assumes full on-time repayment and explains why borrowing costs can outweigh rewards. Amex acceptance reductions remove rewards on the unaccepted share while retaining the entire fee; no backup-card rewards are assumed.
 
 Introductory bonuses, annual-fee waivers, referral payments, insurance valuations, FX benefits and aspirational travel-transfer valuations are excluded. This is a small catalogue, not an exhaustive best-card or eligibility service. Rewards are not counted as forecast income or guaranteed tuition funding. There are no affiliate links, application submissions or automatic account openings.
+
+The integrated forecast also withholds a recommendation when near-term modeled cash is below the protected balance, or liquidity inputs are insufficient or stale. This is an affordability gate, not an inference that an existing credit balance is delinquent. Reward calculations remain visible and never become forecast income.
 
 Tests cover shared caps, annual fees, refunds and exclusions, category selection, sparse data, payment-status gating and acceptance sensitivity.

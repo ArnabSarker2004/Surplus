@@ -13,7 +13,7 @@
     "start": "tsx backend/src/index.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "node --import tsx --test tests/finance.test.ts tests/plaid.test.ts tests/live-plaid.test.ts tests/api.test.ts tests/resources.test.ts tests/auth.test.ts tests/identity.test.ts tests/identity-config.test.ts tests/identity-protocol.test.ts tests/intelligence.test.ts",
+    "test": "node --import tsx --test tests/finance.test.ts tests/cash.test.ts tests/deposits.test.ts tests/student-funding.test.ts tests/plaid.test.ts tests/live-plaid.test.ts tests/api.test.ts tests/resources.test.ts tests/auth.test.ts tests/identity.test.ts tests/identity-config.test.ts tests/identity-protocol.test.ts tests/intelligence.test.ts tests/behavior.test.ts tests/merchants.test.ts tests/action-plan.test.ts tests/enrichment.test.ts",
     "test:e2e": "playwright test",
     "verify:plaid": "tsx scripts/verify-sandbox.ts",
     "plaid:check-banks": "tsx scripts/check-canadian-banks.ts",

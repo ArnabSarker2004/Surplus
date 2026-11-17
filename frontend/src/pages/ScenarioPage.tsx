@@ -55,7 +55,7 @@ export function ScenarioPage() {
       <PageHead
         eyebrow="THE WHAT-IF PLANNER"
         title="Small changes. New possibilities."
-        description="Try a different path for your semester. Your base plan stays yours."
+        description="Compare changes to income, spending, and savings with your semester plan."
         action={<Badge tone="blue">Hypothetical scenario</Badge>}
       />
       <div className="scenario-grid">

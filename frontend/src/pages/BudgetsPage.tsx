@@ -45,7 +45,7 @@ export function BudgetsPage() {
       <PageHead
         eyebrow="BUDGETS & INSIGHTS"
         title="A little intention goes a long way."
-        description="Gentle limits. Useful patterns. More room for what matters."
+        description="Set monthly spending limits and see which habits affect your budget."
         action={
           <div className="button-row">
             <input

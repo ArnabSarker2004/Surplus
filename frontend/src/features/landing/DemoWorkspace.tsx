@@ -29,7 +29,7 @@ const pages = [
   ['semester', 'Semester plan'],
   ['transactions', 'Transactions'],
   ['budgets', 'Budgets & insights'],
-  ['intelligence', 'Forecasts & AI'],
+  ['intelligence', 'Money outlook'],
   ['scenario', 'What-if planner'],
   ['goals', 'Savings goals'],
   ['opportunities', 'Opportunities'],
@@ -110,7 +110,9 @@ export function DemoWorkspace() {
           {pages.map(([id, label]) => (
             <button
               key={id}
-              aria-current={page === id ? 'page' : undefined}
+              aria-current={
+                (page === 'intelligence-goals' ? 'intelligence' : page) === id ? 'page' : undefined
+              }
               onClick={() => navigate(id)}
             >
               {label}
@@ -134,9 +136,9 @@ export function DemoWorkspace() {
             <TransactionsPage />
           ) : page === 'budgets' ? (
             <BudgetsPage />
-          ) : page === 'intelligence' ? (
-            <Suspense fallback={<p role="status">Opening sample forecasts...</p>}>
-              <IntelligencePage />
+          ) : page === 'intelligence' || page === 'intelligence-goals' ? (
+            <Suspense fallback={<p role="status">Opening your sample outlook...</p>}>
+              <IntelligencePage initialTab={page === 'intelligence-goals' ? 'goals' : 'outlook'} />
             </Suspense>
           ) : page === 'scenario' ? (
             <ScenarioPage />

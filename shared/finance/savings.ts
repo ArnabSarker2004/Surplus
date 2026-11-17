@@ -2,18 +2,33 @@ import type { Account, Opportunity, Transaction, Workspace } from '../schema';
 import { asOf, monthsBetween, occurrences, round, sum } from './money';
 import { plan } from './planning';
 import { totals } from './transactions';
+import { cashBreakdown } from './cash';
 
-export function safeToSave(w: Workspace, accounts: Account[], opportunities: Opportunity[]) {
+export function safeToSave(
+  w: Workspace,
+  accounts: Account[],
+  opportunities: Opportunity[],
+  transactions: Transaction[] = [],
+) {
   const date = asOf(w);
   const end = new Date(Date.parse(date) + 30 * 86400000).toISOString().slice(0, 10);
-  const cash = sum(
-    accounts
-      .filter((a) => a.type === 'depository' && a.subtype !== 'savings' && a.currency === 'CAD')
-      .map((a) => a.balance),
+  const breakdown = cashBreakdown(w, accounts, transactions);
+  const chequing = breakdown.rows.filter((r) => r.account.subtype !== 'savings');
+  const cash = sum(chequing.map((r) => r.balance - Math.max(0, -r.account.balance)));
+  const protectedCash = sum(chequing.map((r) => r.loans + r.education + r.unassigned));
+  const personalSavings = sum(
+    breakdown.rows.filter((r) => r.account.subtype === 'savings').map((r) => r.own),
+  );
+  const goalReserve = round(
+    Math.max(0, sum(w.goals.map((g) => Math.min(g.current, g.target))) - personalSavings),
   );
   const income = sum(
     w.funding
-      .filter((f) => f.status === 'Confirmed' || (f.type === 'Earned' && f.status === 'Expected'))
+      .filter(
+        (f) =>
+          (f.type === 'Earned' || f.type === 'Personal') &&
+          (f.status === 'Confirmed' || (f.type === 'Earned' && f.status === 'Expected')),
+      )
       .map(
         (f) =>
           f.amount *
@@ -36,9 +51,28 @@ export function safeToSave(w: Workspace, accounts: Account[], opportunities: Opp
   const gap = plan(w, opportunities).gap;
   const amount = Math.max(
     0,
-    round(cash + income - bills - cardBalance - w.semester.minimumBalance - gap),
+    round(
+      cash -
+        protectedCash +
+        income -
+        bills -
+        cardBalance -
+        goalReserve -
+        w.semester.minimumBalance -
+        gap,
+    ),
   );
-  return { amount, cash, income, bills, cardBalance, gap, buffer: w.semester.minimumBalance };
+  return {
+    amount,
+    cash,
+    protectedCash,
+    goalReserve,
+    income,
+    bills,
+    cardBalance,
+    gap,
+    buffer: w.semester.minimumBalance,
+  };
 }
 export function forecast(w: Workspace, tx: Transaction[], current: number, target: number) {
   const date = asOf(w);
@@ -53,6 +87,9 @@ export function forecast(w: Workspace, tx: Transaction[], current: number, targe
             t.date.startsWith(m) &&
             ![
               'OSAP Funding',
+              'RESP Funding',
+              'Student Aid Funding',
+              'Education Funding',
               'Grants and Bursaries',
               'Scholarships',
               'Stipends and Opportunities',

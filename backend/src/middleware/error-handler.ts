@@ -18,6 +18,10 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
       INVALID_ACCESS_TOKEN: 'The bank access token is invalid. Connect a new bank account.',
       NOT_CONNECTED: 'Connect a bank account first.',
       BUSY: 'A connection operation is already running.',
+      TRIAL_NOT_CONFIRMED:
+        'This call is disabled until the server has a current Plaid Trial plan confirmation. Normal transaction sync remains available.',
+      REFRESH_COOLDOWN:
+        'A bank refresh was requested recently. Wait ten minutes before requesting another.',
       MISSING_ACCESS_TOKEN: 'Set PLAID_SANDBOX_ACCESS_TOKEN in the server .env file.',
     };
     return res.status(err.code === 'BUSY' ? 409 : err.code === 'NOT_CONNECTED' ? 400 : 502).json({

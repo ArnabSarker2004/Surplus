@@ -67,14 +67,14 @@ test('all routes render, category changes persist, settings exposes no secrets',
   await page.goto('/#transactions');
   await page.getByRole('textbox', { name: 'Search transactions' }).fill('Balzac');
   await page
-    .getByRole('button', { name: /Edit Balzac/ })
+    .getByRole('button', { name: /Details for Balzac/ })
     .first()
     .click();
   await page
     .getByRole('dialog')
     .getByRole('combobox', { name: 'Category', exact: true })
     .selectOption('Eating Out');
-  await page.getByRole('button', { name: 'Save category' }).click();
+  await page.getByRole('button', { name: 'Save transaction' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   for (const [hash, heading] of [
     ['overview', 'A little clarity, Alex.'],

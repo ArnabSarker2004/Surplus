@@ -93,6 +93,102 @@
   font-size: 13px;
   line-height: 1.6;
 }
+/* Shared rhythm for page introductions, dense forms and supporting copy. */
+.overview-hero-grid {
+  margin-bottom: 24px;
+}
+.two-col {
+  align-items: start;
+}
+.page-head > div:first-child {
+  max-width: 72ch;
+}
+.page-head h1 {
+  line-height: 1.12;
+  text-wrap: balance;
+}
+.page-head p {
+  max-width: 68ch;
+  line-height: 1.65;
+}
+.section-title {
+  row-gap: 14px;
+}
+.section-title p {
+  max-width: 65ch;
+}
+.field > span:first-child,
+.modal .field > span:first-child {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.field > small,
+.detail-list small,
+.review-section small {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.field-note {
+  line-height: 1.65;
+}
+.detail-list > div {
+  gap: 16px;
+  padding-block: 15px;
+}
+.detail-list > div > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.inline-notice {
+  flex-wrap: wrap;
+  row-gap: 12px;
+  line-height: 1.65;
+}
+.inline-notice > span {
+  flex: 1;
+  min-width: 180px;
+}
+.settings-row {
+  gap: 20px;
+}
+.settings-row > div {
+  min-width: 0;
+  max-width: 68ch;
+}
+.modal-heading {
+  align-items: flex-start;
+  gap: 16px;
+}
+.modal-heading h2 {
+  line-height: 1.35;
+}
+.modal-actions {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.calculation-details {
+  margin-bottom: 24px;
+}
+.two-col > *,
+.form-grid > *,
+.settings-row > * {
+  min-width: 0;
+}
+@media (max-width: 700px) {
+  .two-col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .section-title > .button {
+    flex-shrink: 0;
+  }
+  .settings-row {
+    flex-wrap: wrap;
+  }
+  .modal .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
 @media (max-width: 1100px) {
   .stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

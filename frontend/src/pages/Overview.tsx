@@ -45,12 +45,13 @@ import {
   TransactionIcon,
 } from '../components/ui';
 import { useApp } from '../lib';
+import { StudentMoney } from '../components/StudentMoney';
 
 const colors = ['#244f42', '#92a88b', '#e3bb78', '#b9c8b0', '#cfc9bd', '#a8b9bb'];
 export function Overview() {
   const { w, state, navigate, edit } = useApp();
   const p = plan(w, state.opportunities);
-  const safe = safeToSave(w, state.accounts, state.opportunities);
+  const safe = safeToSave(w, state.accounts, state.opportunities, state.transactions);
   const currentMonth = asOf(w).slice(0, 7);
   const tx = state.transactions.filter((t) => t.date.startsWith(currentMonth));
   const stats = totals(tx);
@@ -71,7 +72,7 @@ export function Overview() {
       <PageHead
         eyebrow={`${w.semester.name} · YOUR SEMESTER AT A GLANCE`}
         title={`A little clarity, ${w.profile.name}.`}
-        description="Your money today. Your possibilities tomorrow."
+        description="Check your cash, upcoming costs, and progress through the semester."
         action={
           <Button variant="secondary" onClick={edit}>
             <CalendarDays size={16} />
@@ -182,20 +183,20 @@ export function Overview() {
       </div>
       <section className="bank-dashboard-prompt forecast-dashboard-prompt">
         <div>
-          <strong>New: forecasts built from your spending patterns</strong>
+          <strong>A clearer view of what’s ahead</strong>
           <p>
-            Explore future cash flow, tuition funding dates, savings goals and credit-card reward
-            matches.
+            See what’s coming in, what’s going out, and how your everyday choices could help your
+            savings grow.
           </p>
         </div>
         <Button onClick={() => navigate('intelligence')}>
-          Open forecasts & AI <ArrowRight size={16} />
+          Open money outlook <ArrowRight size={16} />
         </Button>
       </section>
       <div className="stat-grid">
         <div className="stat-card">
           <span>
-            <Wallet size={17} /> Available cash
+            <Wallet size={17} /> Total cash balance
           </span>
           <strong>{cad(cash, true)}</strong>
           <small>
@@ -205,10 +206,10 @@ export function Overview() {
         </div>
         <div className="stat-card">
           <span>
-            <ArrowDownLeft size={17} /> This month’s income
+            <ArrowDownLeft size={17} /> This month’s money in
           </span>
           <strong>{cad(stats.income, true)}</strong>
-          <small>Posted income · grants and loans included</small>
+          <small>Posted deposits · includes grants and loans, not just earnings</small>
         </div>
         <div className="stat-card">
           <span>
@@ -229,6 +230,7 @@ export function Overview() {
           </small>
         </div>
       </div>
+      <StudentMoney />
       <div className="overview-middle">
         <section className="card chart-card">
           <SectionTitle
@@ -405,7 +407,7 @@ export function Overview() {
       <div className="overview-bottom">
         <section className="card recent-card">
           <SectionTitle
-            title="The latest little things"
+            title="Recent transactions"
             subtitle="Recent account activity"
             action={<TextLink onClick={() => navigate('transactions')}>View all</TextLink>}
           />

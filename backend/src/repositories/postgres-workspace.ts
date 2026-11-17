@@ -81,18 +81,59 @@ export class PostgresWorkspace {
       [userId],
     );
     initial.plaid = plaid.rows[0]?.payload || null;
-    const history = await client.query('SELECT payload FROM surplus.forecast_history WHERE user_id=$1', [userId]);
+    const history = await client.query(
+      'SELECT payload FROM surplus.forecast_history WHERE user_id=$1',
+      [userId],
+    );
     initial.forecastHistory = history.rows[0]?.payload || {};
+    const journal = await client.query(
+      'SELECT payload FROM surplus.intelligence_journal WHERE user_id=$1',
+      [userId],
+    );
+    initial.intelligenceJournal = journal.rows[0]?.payload || {};
+    const enrichment = await client.query(
+      'SELECT payload FROM surplus.merchant_enrichment WHERE user_id=$1',
+      [userId],
+    );
+    initial.merchantEnrichment = enrichment.rows[0]?.payload || { entries: {} };
     return new MemoryDocuments(initial);
   }
   private async save(client: pg.PoolClient, userId: string, store: MemoryDocuments) {
+    if (store.changedKeys.has('merchantEnrichment')) {
+      const value = store.get<Record<string, unknown>>('merchantEnrichment', {});
+      if (Object.keys(value).length)
+        await client.query(
+          'INSERT INTO surplus.merchant_enrichment(user_id,payload) VALUES($1,$2) ON CONFLICT(user_id) DO UPDATE SET payload=EXCLUDED.payload,updated_at=now()',
+          [userId, value],
+        );
+      else await client.query('DELETE FROM surplus.merchant_enrichment WHERE user_id=$1', [userId]);
+    }
+    if (store.changedKeys.has('intelligenceJournal')) {
+      const journal = store.get<Record<string, unknown>>('intelligenceJournal', {});
+      if (Object.keys(journal).length)
+        await client.query(
+          'INSERT INTO surplus.intelligence_journal(user_id,payload) VALUES($1,$2) ON CONFLICT(user_id) DO UPDATE SET payload=EXCLUDED.payload,updated_at=now()',
+          [userId, journal],
+        );
+      else
+        await client.query('DELETE FROM surplus.intelligence_journal WHERE user_id=$1', [userId]);
+    }
     if (store.changedKeys.has('forecastHistory')) {
       const history = store.get<Record<string, unknown>>('forecastHistory', {});
-      if (Object.keys(history).length) await client.query('INSERT INTO surplus.forecast_history(user_id,payload) VALUES($1,$2) ON CONFLICT(user_id) DO UPDATE SET payload=EXCLUDED.payload,updated_at=now()', [userId, history]);
+      if (Object.keys(history).length)
+        await client.query(
+          'INSERT INTO surplus.forecast_history(user_id,payload) VALUES($1,$2) ON CONFLICT(user_id) DO UPDATE SET payload=EXCLUDED.payload,updated_at=now()',
+          [userId, history],
+        );
       else await client.query('DELETE FROM surplus.forecast_history WHERE user_id=$1', [userId]);
       // Recording a forecast never rewrites financial transactions or balances.
-      if (store.changedKeys.size === 1) return;
     }
+    if (
+      [...store.changedKeys].every((k) =>
+        ['forecastHistory', 'intelligenceJournal', 'merchantEnrichment'].includes(k),
+      )
+    )
+      return;
     const workspace = store.get<Workspace | null>('workspace', null);
     const metadata: Record<string, unknown> | null = workspace ? { ...workspace } : null;
     if (metadata)
@@ -129,9 +170,10 @@ export class PostgresWorkspace {
     }
     await insert(
       'merchant_rules',
-      store
-        .get<MerchantRule[]>('rules', [])
-        .map((payload) => ({ id: JSON.stringify([payload.source, payload.merchant]), payload })),
+      store.get<MerchantRule[]>('rules', []).map((payload) => ({
+        id: JSON.stringify([payload.source, payload.merchantKey || payload.merchant]),
+        payload,
+      })),
     );
     const accounts = store.get<Account[]>('accounts', []);
     if (accounts.length)

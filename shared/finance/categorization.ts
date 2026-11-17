@@ -1,11 +1,23 @@
 import type { Category, Classification, MerchantRule, Transaction } from '../schema';
+import { categoryFromPlaid } from '../merchants';
+import { detectStudentFunding } from '../student-funding';
 
-export function classify(category: Category, _cashFlow: number): Classification {
+export function classify(category: Category, cashFlow: number): Classification {
+  if (
+    ['OSAP Funding', 'RESP Funding', 'Student Aid Funding', 'Education Funding'].includes(
+      category,
+    ) &&
+    cashFlow <= 0
+  )
+    return 'Review';
   if (['Debt Payments', 'Savings Transfer', 'Investing'].includes(category)) return 'Transfer';
   if (
     [
       'Employment Income',
       'OSAP Funding',
+      'RESP Funding',
+      'Student Aid Funding',
+      'Education Funding',
       'Grants and Bursaries',
       'Scholarships',
       'Stipends and Opportunities',
@@ -35,20 +47,24 @@ export function categorize(
   confidence: string,
   rules: MerchantRule[],
   source: Transaction['source'],
+  cashFlow = 1,
+  currency = 'CAD',
+  description = merchant,
 ): Category {
   const rule = rules.find(
     (r) => r.merchant.toLowerCase() === merchant.toLowerCase() && r.source === source,
   );
   if (rule) return rule.category;
+  const funding = detectStudentFunding({ merchant, description, cashFlow, currency });
+  if (funding) return funding.category;
+  if (cashFlow > 0 && /\b(?:PAYROLL|SALARY|WAGES)\b/i.test(description)) return 'Employment Income';
   const name = merchant.toLowerCase();
   const known: [RegExp, Category][] = [
-    [/osap/, 'OSAP Funding'],
     [/bursary|grant/, 'Grants and Bursaries'],
     [/scholarship/, 'Scholarships'],
     [/stipend|learning zone/, 'Stipends and Opportunities'],
-    [/tuition|toronto metropolitan|tmu fees/, 'Tuition and School'],
+    [/\btuition\b|\btmu fees\b/, 'Tuition and School'],
     [/textbook|campus bookstore/, 'Textbooks and Supplies'],
-    [/presto|ttc|go transit/, 'TTC and PRESTO'],
     [/spotify|netflix|icloud|adobe|youtube premium/, 'Subscriptions'],
     [/coffee|tim hortons|starbucks|balzac/, 'Coffee'],
     [/payroll/, 'Employment Income'],
@@ -57,23 +73,5 @@ export function categorize(
   ];
   for (const [match, category] of known) if (match.test(name)) return category;
   if (!['HIGH', 'VERY_HIGH'].includes(confidence)) return 'Other';
-  const v = `${primary} ${detailed}`;
-  const map: [RegExp, Category][] = [
-    [/LOAN_PAYMENTS_CREDIT_CARD/, 'Debt Payments'],
-    [/TRANSFER.*(INVESTMENT|RETIREMENT)/, 'Investing'],
-    [/TRANSFER_IN|TRANSFER_OUT/, 'Savings Transfer'],
-    [/INCOME/, 'Employment Income'],
-    [/COFFEE/, 'Coffee'],
-    [/GROCERIES/, 'Groceries'],
-    [/FOOD_AND_DRINK/, 'Eating Out'],
-    [/RENT|MORTGAGE/, 'Housing'],
-    [/TELEPHONE|INTERNET/, 'Phone and Internet'],
-    [/TRANSPORTATION_TAXIS/, 'Rideshare'],
-    [/TRANSPORTATION_PUBLIC/, 'TTC and PRESTO'],
-    [/MEDICAL/, 'Healthcare'],
-    [/GYMS/, 'Fitness'],
-    [/ENTERTAINMENT/, 'Entertainment'],
-    [/GENERAL_MERCHANDISE/, 'Shopping'],
-  ];
-  return map.find(([re]) => re.test(v))?.[1] ?? 'Other';
+  return categoryFromPlaid(primary, detailed);
 }

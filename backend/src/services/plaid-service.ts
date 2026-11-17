@@ -14,10 +14,30 @@ import {
 } from '../integrations/plaid';
 import { studentSandboxConfig } from '../integrations/student-sandbox';
 import type { WorkspaceRepository } from '../repositories/workspace-repository';
+import { observeBalances } from './forecast-evaluation';
+import type { DocumentStore } from '../infrastructure/document-store';
+import { enrichWorkspace } from './merchant-enrichment';
+const workingStores = new WeakSet<DocumentStore>();
+
+export function trialFeaturesEnabled(now = Date.now()) {
+  const date = Date.parse(process.env.PLAID_TRIAL_CONFIRMED_ON || '');
+  return (
+    process.env.PLAID_PLAN === 'trial' &&
+    Number.isFinite(date) &&
+    now >= date &&
+    now - date < 30 * 86400000
+  );
+}
 
 /** Owns connection lifecycle and the all-pages-or-nothing sync boundary. */
 export class PlaidService {
-  private working = false;
+  private get working() {
+    return workingStores.has(this.repository.store);
+  }
+  private set working(value: boolean) {
+    if (value) workingStores.add(this.repository.store);
+    else workingStores.delete(this.repository.store);
+  }
   constructor(
     private repository: WorkspaceRepository,
     private key: Buffer,
@@ -44,6 +64,7 @@ export class PlaidService {
       status: this.working ? 'syncing' : (p?.status ?? 'disconnected'),
       syncedAt: p?.syncedAt ?? null,
       error: p?.error ?? null,
+      trialFeatures: trialFeaturesEnabled(),
     };
   }
   async linkToken(environment: PlaidEnvironment = 'sandbox', update = false) {
@@ -58,7 +79,7 @@ export class PlaidService {
         client_name: 'Surplus',
         ...(update
           ? { access_token: decrypt(item!.encryptedToken, this.key) }
-          : { products: ['transactions'], transactions: { days_requested: 365 } }),
+          : { products: ['transactions'], transactions: { days_requested: 730 } }),
         country_codes: ['CA'],
         language: 'en',
       },
@@ -147,10 +168,17 @@ export class PlaidService {
     const source = bankSource(environment);
     try {
       const token = decrypt(p.encryptedToken, this.key);
-      const data = await collectSync(p.cursor, (cursor) =>
+      // Replay the existing Item once to hydrate metadata discarded by older app versions.
+      // Stage all pages before saving the new cursor/version; never create another Item.
+      const data = await collectSync(p.transactionMetadataVersion === 3 ? p.cursor : '', (cursor) =>
         plaidRequest<SyncPage>(
           '/transactions/sync',
-          { access_token: token, cursor, count: 100 },
+          {
+            access_token: token,
+            cursor,
+            count: 100,
+            options: { include_original_description: true },
+          },
           environment,
         ),
       );
@@ -173,11 +201,19 @@ export class PlaidService {
         store.set('plaid', {
           ...p,
           cursor: data.cursor,
+          transactionMetadataVersion: 3,
           syncedAt: new Date().toISOString(),
           status: 'ready',
           error: null,
         });
+        observeBalances(this.repository, source);
       });
+      // Optional enrichment never prevents a successful bank import.
+      try {
+        await enrichWorkspace(this.repository);
+      } catch {
+        /* Keep the bank's original labels. */
+      }
     } catch (error) {
       this.repository.store.transaction(() =>
         this.repository.store.set('plaid', {
@@ -190,6 +226,44 @@ export class PlaidService {
         }),
       );
       throw error;
+    } finally {
+      this.working = false;
+    }
+  }
+  async trialRefresh(kind: 'transactions' | 'balance') {
+    const item = this.item();
+    if (!item) throw new PlaidError('NOT_CONNECTED');
+    if (item.environment === 'production' && !trialFeaturesEnabled())
+      throw new PlaidError('TRIAL_NOT_CONFIRMED');
+    if (this.busy) throw new PlaidError('BUSY');
+    if (
+      item.lastRefreshRequestedAt &&
+      Date.now() - Date.parse(item.lastRefreshRequestedAt) < 10 * 60000
+    )
+      throw new PlaidError('REFRESH_COOLDOWN');
+    this.working = true;
+    try {
+      const token = decrypt(item.encryptedToken, this.key);
+      const environment = item.environment || 'sandbox';
+      if (kind === 'transactions')
+        await plaidRequest('/transactions/refresh', { access_token: token }, environment);
+      else {
+        const accounts = await plaidAccounts(token, environment, true);
+        const source = bankSource(environment);
+        this.repository.store.transaction(() => {
+          this.repository.store.set('accounts', [
+            ...this.repository.accounts().filter((a) => a.source !== source),
+            ...accounts,
+          ]);
+          observeBalances(this.repository, source);
+        });
+      }
+      this.repository.store.transaction(() =>
+        this.repository.store.set('plaid', {
+          ...item,
+          lastRefreshRequestedAt: new Date().toISOString(),
+        }),
+      );
     } finally {
       this.working = false;
     }
@@ -228,6 +302,9 @@ export class PlaidService {
         );
         const w = this.repository.workspace();
         if (w?.source === source) store.set('workspace', { ...w, source: 'manual' });
+        store.remove('intelligenceJournal');
+        store.remove('merchantEnrichment');
+        store.remove('forecastHistory');
       });
     } finally {
       this.working = false;

@@ -7,6 +7,7 @@ import type {
   Workspace,
 } from '../../../shared/schema';
 import type { DocumentStore } from '../infrastructure/document-store';
+import { applyAutomaticCleanup } from '../../../shared/transaction-cleanup';
 
 /** Persistence boundary. Services operate on domain objects, never SQL. */
 export class WorkspaceRepository {
@@ -16,7 +17,7 @@ export class WorkspaceRepository {
     return workspace ? { ...workspace, resourceProgress: workspace.resourceProgress ?? {} } : null;
   }
   transactions() {
-    return this.store.get<Transaction[]>('transactions', []);
+    return this.store.get<Transaction[]>('transactions', []).map(applyAutomaticCleanup);
   }
   accounts() {
     return this.store.get<Account[]>('accounts', []);
@@ -57,7 +58,16 @@ export class WorkspaceRepository {
   }
   clear() {
     this.store.transaction(() => {
-      for (const key of ['workspace', 'transactions', 'accounts', 'rules', 'plaid', 'forecastHistory'])
+      for (const key of [
+        'workspace',
+        'transactions',
+        'accounts',
+        'rules',
+        'plaid',
+        'forecastHistory',
+        'intelligenceJournal',
+        'merchantEnrichment',
+      ])
         this.store.remove(key);
     });
   }
@@ -72,7 +82,14 @@ export class WorkspaceRepository {
     const rows = this.transactions();
     const match = rows.find((t) => t.id === id && t.source === source);
     if (!match) return false;
-    this.store.transaction(() => this.store.set('transactions', rows.map((t) => t.id === id && t.source === source ? { ...t, habitTreatment: treatment } : t)));
+    this.store.transaction(() =>
+      this.store.set(
+        'transactions',
+        rows.map((t) =>
+          t.id === id && t.source === source ? { ...t, habitTreatment: treatment } : t,
+        ),
+      ),
+    );
     return true;
   }
 }

@@ -24,6 +24,7 @@ export function FundingEditor({
             'Family support',
             'OSAP grant',
             'OSAP loan',
+            'Education fund / RESP',
             'Scholarship',
             'Employment income',
           ] as const
@@ -146,8 +147,9 @@ export function FundingEditor({
         <Plus size={17} /> Add funding source
       </Button>
       <p className="field-note">
-        Keep grants and loans separate. Applied funding stays pending. Expected employment is shown
-        separately and included in your projection.
+        Split OSAP deposits into separate grant and loan entries. Add RESP or other education
+        funding separately. Applied funding is excluded from the plan. Review money already in your
+        accounts in the balance breakdown; planned funding does not assign your current cash.
       </p>
     </div>
   );

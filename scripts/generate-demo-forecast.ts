@@ -17,6 +17,8 @@ const payload = forecastPayload(
     rules: [],
   },
   defaultForecastOptions,
+  null,
+  demoCpi as EconomicContext,
 );
 const python = resolve(
   'services/intelligence/.venv',

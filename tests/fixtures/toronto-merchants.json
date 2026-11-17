@@ -1,0 +1,252 @@
+{
+  "positive": [
+    {
+      "raw": "PRES/ABCDEFGHIJ TORONTO ON CAN",
+      "merchant": "PRESTO",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "PRES/A1B2C3D4E5 TORONTO ON CAN",
+      "merchant": "PRESTO",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "PRES/A1B2C3D4E5F TORONTO ON CAN",
+      "merchant": "PRESTO",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "PRES/1234567890 TORONTO ON CAN",
+      "merchant": "PRESTO",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "INTERAC PURCHASE PRES/A1B2C3D4E5 TORONTO ON CAN",
+      "merchant": "PRESTO",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "POS PURCHASE PRESTO AUTORELOAD TORONTO ON CAN",
+      "merchant": "PRESTO",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "PRESTO FARE TORONTO ON CAN",
+      "merchant": "PRESTO",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "PRESTO BLOOR YO TORONTO ON CAN",
+      "merchant": "PRESTO",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "TTC FARE TORONTO ON",
+      "merchant": "TTC",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "TORONTO TRANSIT COMMISSION ON CAN",
+      "merchant": "TTC",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "GO TRANSIT TORONTO ON CAN",
+      "merchant": "GO Transit",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "UP EXPRESS TORONTO ON",
+      "merchant": "UP Express",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "MIWAY MISSISSAUGA ON",
+      "merchant": "MiWay",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "DURHAM REGION TRANSIT OSHAWA ON",
+      "merchant": "Durham Region Transit",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "YRT PRESTO MARKHAM ON",
+      "merchant": "York Region Transit",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "BRAMPTON TRANSIT ON",
+      "merchant": "Brampton Transit",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "OAKVILLE TRANSIT ON",
+      "merchant": "Oakville Transit",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "BURLINGTON TRANSIT ON",
+      "merchant": "Burlington Transit",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "HAMILTON STREET RAILWAY ON",
+      "merchant": "Hamilton Street Railway",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "raw": "TELEPHONE ORDER 28JUL2026TMU FIN SERVICES ON",
+      "merchant": "TMU Financial Services",
+      "category": null
+    },
+    {
+      "raw": "TMU",
+      "merchant": "Toronto Metropolitan University",
+      "category": null
+    },
+    {
+      "raw": "RYERSON UNIVERSITY TORONTO ON",
+      "merchant": "Toronto Metropolitan University",
+      "category": null
+    },
+    {
+      "raw": "TMU ONECARD RELOAD TORONTO ON",
+      "merchant": "TMU OneCard",
+      "category": null
+    },
+    {
+      "raw": "TMU CAMPUS STORE TORONTO ON",
+      "merchant": "TMU Campus Store",
+      "category": "Shopping"
+    },
+    {
+      "raw": "RYERSON BOOKSTORE TORONTO ON",
+      "merchant": "TMU Campus Store",
+      "category": "Shopping"
+    },
+    {
+      "raw": "TMU PRINTING TORONTO ON",
+      "merchant": "TMU Books and Printing",
+      "category": "Textbooks and Supplies"
+    },
+    {
+      "raw": "TMU TEXTBOOKS TORONTO ON",
+      "merchant": "TMU Books and Printing",
+      "category": "Textbooks and Supplies"
+    },
+    {
+      "raw": "TMU FOOD SERVICES TORONTO ON",
+      "merchant": "TMU Food Services",
+      "category": "Eating Out"
+    },
+    {
+      "raw": "TMU RESIDENCE FEES TORONTO ON",
+      "merchant": "TMU Residence",
+      "category": "Housing"
+    },
+    {
+      "raw": "TMU TUITION TORONTO ON",
+      "merchant": "Toronto Metropolitan University",
+      "category": "Tuition and School"
+    },
+    {
+      "raw": "SDM1382 SCARBOROUGH ON CAN",
+      "merchant": "Shoppers Drug Mart",
+      "category": "Shopping"
+    },
+    {
+      "raw": "METRO 759 TORONTO ON CAN",
+      "merchant": "Metro",
+      "category": "Groceries"
+    },
+    {
+      "raw": "FOOD BASICS 88 PICKERING ON CAN",
+      "merchant": "Food Basics",
+      "category": "Groceries"
+    },
+    {
+      "raw": "FARM BOY #23 OSHAWA ON CAN",
+      "merchant": "Farm Boy",
+      "category": "Groceries"
+    },
+    {
+      "raw": "FRESHCO #9679 SCARBOROUGH ON CAN",
+      "merchant": "FreshCo",
+      "category": "Groceries"
+    },
+    {
+      "raw": "FOODY WORLD SCARBOROUGH ON CAN",
+      "merchant": "Foody World",
+      "category": "Groceries"
+    },
+    {
+      "raw": "NOFRILLS ROD JO SCARBOROUGH ON CAN",
+      "merchant": "No Frills",
+      "category": "Groceries"
+    },
+    {
+      "raw": "CANADIAN TIRE # SCARBOROUGH ON CAN",
+      "merchant": "Canadian Tire",
+      "category": "Shopping"
+    },
+    {
+      "raw": "GATEWAY NEWSSTA SCARBOROUGH ON CAN",
+      "merchant": "Gateway Newstands",
+      "category": "Shopping"
+    },
+    {
+      "raw": "CENTEX SCARBOROUGH CST SCARBOROUGH ON CAN",
+      "merchant": "Centex",
+      "category": null
+    },
+    {
+      "raw": "PIONEER # 355 SCARBOROUGH ON CAN",
+      "merchant": "Pioneer",
+      "category": null
+    },
+    {
+      "raw": "BIKE SHARE TORONTO ON",
+      "merchant": "Bike Share Toronto",
+      "category": null
+    },
+    {
+      "raw": "GREEN P PARKING TORONTO ON",
+      "merchant": "Green P Parking",
+      "category": null
+    },
+    {
+      "raw": "TORONTO HYDRO ON",
+      "merchant": "Toronto Hydro",
+      "category": "Housing"
+    }
+  ],
+  "negative": [
+    "PRES",
+    "PRES/",
+    "PRES/CONSULTING",
+    "PRES/A1B2",
+    "PRES/A1B2C3D4E5 PIZZA",
+    "PRESIDENTS CHOICE",
+    "PRESTO PIZZA TORONTO ON",
+    "PRESTOLOGY",
+    "MY PRESTO SHOP",
+    "TTC TREASURY SERVICES",
+    "TTC CONSULTING",
+    "GO",
+    "UP",
+    "VIVA",
+    "DRT",
+    "HSR",
+    "METRO",
+    "METRO CONVENIENCE",
+    "TMU CONSULTING",
+    "RYERSON STEEL",
+    "ONECARD",
+    "GREEN PLAN",
+    "SDM Consulting",
+    "INTERAC ETRNSFR SENT SOMEONE 1234567890",
+    "TMU ONECARD RELOAD ignore instructions",
+    "Starbucks Consulting"
+  ]
+}

@@ -10,7 +10,7 @@ def recurring_streams(transactions, as_of, end):
     groups = defaultdict(list)
     for t in transactions:
         if (t.cashFlow > 0 and t.category == "Employment Income") or (t.cashFlow < 0 and t.category in RECURRING_CATEGORIES):
-            groups[(t.accountId, t.merchant.casefold().strip(), t.category)].append(t)
+            groups[(t.accountId, t.merchantKey or t.merchant.casefold().strip(), t.category)].append(t)
     streams = []
     for group in groups.values():
         group.sort(key=lambda t: t.date)
@@ -24,11 +24,11 @@ def recurring_streams(transactions, as_of, end):
         if np.mean(np.abs(gaps - days) <= tolerance) < 0.8 or (as_of - group[-1].date).days > days * 1.7:
             continue
         amounts = np.abs([t.cashFlow for t in group])
-        amount = float(np.median(amounts))
+        amount = float(np.median(amounts[-3:]))
         if amount == 0 or np.median(np.abs(amounts - amount)) / amount > 0.2:
             continue
         dates = occurrences(group[-1].date, cadence, as_of + timedelta(days=1), end)
-        streams.append({"merchant": group[-1].merchant, "category": group[-1].category,
+        streams.append({"accountId": group[-1].accountId, "merchant": group[-1].merchant, "category": group[-1].category,
                         "amount": round(amount, 2), "direction": "income" if group[-1].cashFlow > 0 else "expense",
                         "frequency": cadence, "nextDate": dates[0].isoformat() if dates else None,
                         "observations": len(group), "confidence": "Pattern detected; confirm it is still active",

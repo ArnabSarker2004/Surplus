@@ -21,6 +21,7 @@ test('demo pages keep chart labels and content inside mobile, tablet and desktop
       'Semester plan',
       'Transactions',
       'Budgets & insights',
+      'Money outlook',
       'What-if planner',
       'Savings goals',
       'Opportunities',
@@ -77,7 +78,16 @@ test('demo pages keep chart labels and content inside mobile, tablet and desktop
           )
           .toEqual([]);
       }
-      if (['Overview', 'What-if planner', 'Transactions'].includes(name)) {
+      if (
+        [
+          'Overview',
+          'What-if planner',
+          'Transactions',
+          'Semester plan',
+          'Savings goals',
+          'Money outlook',
+        ].includes(name)
+      ) {
         await page.screenshot({
           path: `artifacts/polish-${name.split(' ')[0].toLowerCase()}-${width}.png`,
           fullPage: true,

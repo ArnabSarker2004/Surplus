@@ -1,0 +1,235 @@
+{
+  "version": "merchant-cleanup-3",
+  "paymentPrefix": "^(?:(?:TST|SQ|PAYPAL|SP|CHK|DD)\\s*\\*\\s*|POS\\s+(?:PURCHASE\\s+)?|(?:DEBIT|INTERAC)\\s+PURCHASE\\s+|(?:ONLINE PURCHASE|TELEPHONE ORDER|RECURRING PYMNT)\\s+(?:\\d{1,2}(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\\d{4})?)",
+  "suffix": "(?:[ ,*#-]+(?:#?\\s*\\d{1,7}|STORE\\s+\\d{1,7}|TORONTO|SCARBOROUGH|NORTH YORK|EAST YORK|ETOBICOKE|MISSISSAUGA|BRAMPTON|OSHAWA|WHITBY|AJAX|PICKERING|MARKHAM|RICHMOND HILL|VAUGHAN|OAKVILLE|BURLINGTON|HAMILTON|CANADA|CAN|CA|ON|QC|BC|AB|MB|SK|NS|NB|NL|PE|NT|NU|YT))*",
+  "entries": [
+    {
+      "id": "presto-contactless",
+      "pattern": "PRES/(?:(?=[A-Z0-9]*[0-9])[A-Z0-9]{10,11}|[A-Z]{10,11}(?= TORONTO ON(?: CAN| CA| CANADA)?$))",
+      "merchant": "PRESTO",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "id": "presto",
+      "pattern": "PRESTO(?:[ *-]+(?:FARE|CONTACTLESS|AUTO[ -]?RELOAD|LOAD|RELOAD|CARD|BLOOR[ -]+YO(?:NGE)?|UNION(?: STATION)?|DUNDAS|FINCH|KENNEDY))*",
+      "merchant": "PRESTO",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "id": "ttc",
+      "pattern": "(?:TTC(?:[ *-]+(?:FARE|PRESTO|TRANSIT|PASS))*|TORONTO TRANSIT COMMISSION)",
+      "merchant": "TTC",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "id": "go-transit",
+      "pattern": "GO[ -]+TRANSIT(?:[ *-]+(?:FARE|TICKET|PRESTO))*",
+      "merchant": "GO Transit",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "id": "up-express",
+      "pattern": "(?:UP[ -]+EXPRESS|UNION PEARSON EXPRESS)(?:[ *-]+(?:FARE|TICKET))*",
+      "merchant": "UP Express",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "id": "miway",
+      "pattern": "(?:MIWAY|MISSISSAUGA TRANSIT)(?:[ *-]+(?:FARE|PRESTO))*",
+      "merchant": "MiWay",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "id": "durham-transit",
+      "pattern": "DURHAM (?:REGION(?:AL)? )?TRANSIT",
+      "merchant": "Durham Region Transit",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "id": "yrt",
+      "pattern": "(?:YORK REGION TRANSIT|YRT(?:[ *-]+(?:FARE|PRESTO|VIVA))?)",
+      "merchant": "York Region Transit",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "id": "brampton-transit",
+      "pattern": "BRAMPTON TRANSIT",
+      "merchant": "Brampton Transit",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "id": "oakville-transit",
+      "pattern": "OAKVILLE TRANSIT",
+      "merchant": "Oakville Transit",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "id": "burlington-transit",
+      "pattern": "BURLINGTON TRANSIT",
+      "merchant": "Burlington Transit",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "id": "hsr",
+      "pattern": "HAMILTON STREET RAILWAY",
+      "merchant": "Hamilton Street Railway",
+      "category": "TTC and PRESTO"
+    },
+    {
+      "id": "tmu-onecard",
+      "pattern": "(?:TMU|TORONTO METROPOLITAN(?: UNIVERSITY)?|RYERSON(?: UNIVERSITY)?)[ *-]+ONE[ -]?CARD(?:[ *-]+(?:LOAD|RELOAD|TOP[ -]?UP|CAMPUS FUND))*",
+      "merchant": "TMU OneCard",
+      "category": null
+    },
+    {
+      "id": "tmu-books",
+      "pattern": "(?:TMU|TORONTO METROPOLITAN(?: UNIVERSITY)?|RYERSON(?: UNIVERSITY)?)[ *-]+(?:TEXTBOOKS?|PRINTING|DUPLICATING|COPYRITE)",
+      "merchant": "TMU Books and Printing",
+      "category": "Textbooks and Supplies"
+    },
+    {
+      "id": "tmu-campus-store",
+      "pattern": "(?:TMU|TORONTO METROPOLITAN(?: UNIVERSITY)?|RYERSON(?: UNIVERSITY)?)[ *-]+(?:CAMPUS[ -]?STORE|BOOKSTORE)",
+      "merchant": "TMU Campus Store",
+      "category": "Shopping"
+    },
+    {
+      "id": "tmu-food",
+      "pattern": "(?:TMU|TORONTO METROPOLITAN(?: UNIVERSITY)?|RYERSON(?: UNIVERSITY)?)[ *-]+(?:FOOD SERVICES|DINING|MEAL PLAN)",
+      "merchant": "TMU Food Services",
+      "category": "Eating Out"
+    },
+    {
+      "id": "tmu-housing",
+      "pattern": "(?:TMU|TORONTO METROPOLITAN(?: UNIVERSITY)?|RYERSON(?: UNIVERSITY)?)[ *-]+(?:RESIDENCE|HOUSING)(?: FEES)?",
+      "merchant": "TMU Residence",
+      "category": "Housing"
+    },
+    {
+      "id": "tmu-tuition",
+      "pattern": "(?:TMU|TORONTO METROPOLITAN(?: UNIVERSITY)?|RYERSON(?: UNIVERSITY)?)[ *-]+(?:TUITION|FEES|TUITION FEES)",
+      "merchant": "Toronto Metropolitan University",
+      "category": "Tuition and School"
+    },
+    {
+      "id": "tmu-finance",
+      "pattern": "(?:TMU|TORONTO METROPOLITAN(?: UNIVERSITY)?|RYERSON(?: UNIVERSITY)?)[ *-]+FIN(?:ANCIAL)?[ *-]+SERVICES",
+      "merchant": "TMU Financial Services",
+      "category": null
+    },
+    {
+      "id": "tmu",
+      "pattern": "(?:TMU|TORONTO METROPOLITAN UNIVERSITY|RYERSON UNIVERSITY)",
+      "merchant": "Toronto Metropolitan University",
+      "category": null
+    },
+    {
+      "id": "sdm",
+      "pattern": "SDM\\s*#?\\s*\\d{1,5}\\s+[A-Z .'-]+\\s+(?:ON|QC|BC|AB|MB|SK|NS|NB|NL|PE|NT|NU|YT)(?:\\s+(?:CAN|CA|CANADA))?",
+      "merchant": "Shoppers Drug Mart",
+      "category": "Shopping"
+    },
+    {
+      "id": "metro-store",
+      "pattern": "METRO\\s+#?\\s*\\d{1,4}",
+      "merchant": "Metro",
+      "category": "Groceries"
+    },
+    {
+      "id": "food-basics",
+      "pattern": "FOOD BASICS",
+      "merchant": "Food Basics",
+      "category": "Groceries"
+    },
+    {
+      "id": "freshco",
+      "pattern": "FRESHCO",
+      "merchant": "FreshCo",
+      "category": "Groceries"
+    },
+    {
+      "id": "farm-boy",
+      "pattern": "FARM BOY",
+      "merchant": "Farm Boy",
+      "category": "Groceries"
+    },
+    {
+      "id": "foody-world",
+      "pattern": "FOODY WORLD",
+      "merchant": "Foody World",
+      "category": "Groceries"
+    },
+    {
+      "id": "no-frills",
+      "pattern": "(?:NO\\s?FRILLS|NOFRILLS ROD JO)",
+      "merchant": "No Frills",
+      "category": "Groceries"
+    },
+    {
+      "id": "canadian-tire",
+      "pattern": "CANADIAN TIRE",
+      "merchant": "Canadian Tire",
+      "category": "Shopping"
+    },
+    {
+      "id": "dollarama",
+      "pattern": "DOLLARAMA",
+      "merchant": "Dollarama",
+      "category": "Shopping"
+    },
+    {
+      "id": "gateway",
+      "pattern": "GATEWAY NEWSSTA(?:ND|NDS)?",
+      "merchant": "Gateway Newstands",
+      "category": "Shopping"
+    },
+    {
+      "id": "centex",
+      "pattern": "CENTEX(?: SCARBORO(?:UGH)?(?: CST)?)?",
+      "merchant": "Centex",
+      "category": null
+    },
+    {
+      "id": "pioneer-store",
+      "pattern": "PIONEER\\s*#\\s*\\d{1,4}",
+      "merchant": "Pioneer",
+      "category": null
+    },
+    {
+      "id": "bike-share",
+      "pattern": "BIKE[ -]?SHARE TORONTO",
+      "merchant": "Bike Share Toronto",
+      "category": null
+    },
+    {
+      "id": "green-p",
+      "pattern": "GREEN[ -]?P(?: PARKING| MOBILE PAY)?",
+      "merchant": "Green P Parking",
+      "category": null
+    },
+    {
+      "id": "toronto-hydro",
+      "pattern": "TORONTO HYDRO",
+      "merchant": "Toronto Hydro",
+      "category": "Housing"
+    }
+  ],
+  "context": [
+    "This application supports students and residents in Toronto and the Greater Toronto and Hamilton Area, including people commuting to Toronto Metropolitan University (TMU, formerly Ryerson). This is a regional glossary, not evidence that a user attends TMU or made a particular trip. Only identify a merchant from its descriptor.",
+    "PRESTO contactless debit descriptors can start PRES/ followed by a confirmation reference. PRESTO, TTC, GO Transit, UP Express, MiWay, Durham Region Transit (DRT), York Region Transit (YRT/Viva), Brampton Transit, Oakville Transit, Burlington Transit and Hamilton Street Railway (HSR) are transit systems: use TTC and PRESTO when the descriptor supports a fare or transit purchase. Do not infer the transit operator, station, route or a student fare from PRES/ alone. GO, UP, DRT, HSR, VIVA, PRES or METRO alone are ambiguous. PRESTO Pizza and TTC Treasury Services are not automatically transit fares.",
+    "TMU/Ryerson can mean the university, not necessarily tuition. Explicit tuition or academic fees use Tuition and School; explicit textbooks, course supplies or printing use Textbooks and Supplies; food services or meal plans use Eating Out; residence payments use Housing. TMU Campus Store sells books, clothing and gifts: use Shopping unless the descriptor explicitly identifies books/supplies. TMU OneCard loads are multipurpose campus funds and TMU Financial Services handles different payments: identify the name but return null category without a specific purchase purpose. OneCard alone does not identify TMU.",
+    "Metro store-number descriptors in Ontario are the grocery retailer, not a subway. Food Basics, FreshCo, Farm Boy, No Frills and Foody World are grocery brands. SDM with a store number and Canadian location means Shoppers Drug Mart. Shoppers Drug Mart, Dollarama, Canadian Tire, Gateway Newstands and convenience stores are mixed retailers: use Shopping, not an invented receipt item. Centex and Pioneer may sell fuel and convenience goods; their names alone do not identify the purchase.",
+    "Bike Share Toronto is bicycle sharing, Green P is Toronto parking, and Toronto Hydro is the electricity utility (Housing). The current category list has no dedicated parking, fuel or bike-sharing category: identify clear names but return null category rather than calling them transit fares or rideshare. Bare abbreviations, location names, bank service-plan labels, payment processors and personal transfers do not identify a merchant.",
+    "Canadian bank wrappers such as ONLINE PURCHASE, TELEPHONE ORDER and RECURRING PYMNT may precede a compact date and merchant. APPLE.COM/BILL may be apps, media or subscriptions; do not infer a recurring subscription from that label alone. Preserve trading names; do not expand FreshCo to a legal LLC or Canadian Tire to an invented company name."
+  ],
+  "sources": [
+    "https://www.prestocard.ca/en/help-centre/help-by-topic/faq?type=accountManagement",
+    "https://www.metrolinx.com/en/discover/more-ways-to-pay-presto-introduces-debit-taps-on-transit",
+    "https://www.torontomu.ca/onecard/using-your-onecard/pay-for-products-and-services/",
+    "https://www.torontomu.ca/financial-services/billing-banking/collection-services/payment-methods/",
+    "https://parking.greenp.com/",
+    "https://bikesharetoronto.com/",
+    "https://www.foodyworld.ca/",
+    "https://news.ontario.ca/en/backgrounder/58491/ontario-expands-covid-19-testing-to-pharmacies"
+  ]
+}

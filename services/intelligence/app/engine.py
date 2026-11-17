@@ -10,6 +10,10 @@ from .patterns import recurring_streams, spending_patterns
 from .economy import PriceContext
 from .habits import weekly_habits, weekday_profile, intervention_shares
 from .goals import allocate_goals
+from .behavior import analyze_behavior
+from .liquidity import liquidity_report
+from .action_plan import action_plan, account_outlooks
+from .student import uses_work_schedule, student_outlook
 
 VERSION = "surplus-forecast-1.0"
 FLEXIBLE = {"Eating Out", "Coffee", "Rideshare", "Shopping", "Entertainment", "Subscriptions", "Fitness"}
@@ -47,8 +51,9 @@ def analyze(request: ForecastRequest):
         warnings.append("No CAD cash account balance is available. Enter current cash to estimate affordability; credit limits are never cash.")
     if latest and (now - latest).days > 14:
         warnings.append("The latest posted transaction is over 14 days old. Sync and verify that the linked accounts cover your everyday spending.")
-    if any(t.classification == "Review" for t in eligible):
-        warnings.append("Some transactions need categorization. Unknown withdrawals count as spending; unknown deposits are not projected as income.")
+    review_count = sum(t.reviewRequired for t in eligible)
+    if review_count:
+        warnings.append(f"{review_count} transaction{'s' if review_count != 1 else ''} need{'s' if review_count == 1 else ''} a category or corrected split.")
     if goal_reserve > max(0, opening):
         warnings.append("Saved goal balances exceed usable linked cash. Goal savings are assumed to be inside the starting cash balance; check missing accounts and saved amounts.")
     if pending_reserve:
@@ -61,6 +66,7 @@ def analyze(request: ForecastRequest):
         from .contracts import Expense
         expenses = [e for e in expenses if e.category != "Tuition and School"] + [Expense(id="custom-tuition", name="Tuition target", amount=options.tuition.amount, date=options.tuition.dueDate, category="Tuition and School", frequency="Once")]
     scheduled_expenses, scheduled_income = np.zeros(days + 1), np.zeros(days + 1)
+    protected_income = np.zeros(days + 1)
     tuition_events, ledger = [], []
     overridden = {e.category for e in expenses if e.frequency == "Monthly" and e.date <= end}
     # Tuition is a known, lumpy obligation, not something to learn as weekly consumption.
@@ -69,23 +75,24 @@ def analyze(request: ForecastRequest):
         for when in occurrences(expense.date, expense.frequency, start, end):
             index = (when - now).days
             scheduled_expenses[index] += expense.amount
-            ledger.append({"date": when.isoformat(), "label": expense.name, "amount": money(expense.amount), "direction": "expense", "origin": "Your plan"})
+            ledger.append({"date": when.isoformat(), "label": expense.name, "amount": money(expense.amount), "direction": "expense", "origin": "Your plan", "accountId": expense.accountId})
             if expense.category == "Tuition and School":
                 tuition_events.append((expense.id, expense.name, when, expense.amount))
         if expense.category == "Tuition and School" and not occurrences(expense.date, expense.frequency, start, end):
             tuition_events.append((expense.id, expense.name, expense.date, expense.amount))
-    future_funding = []
     for fund in request.funding:
         if fund.status != "Confirmed" and not (fund.type == "Earned" and fund.status == "Expected"):
             continue
         due_dates = occurrences(fund.date, fund.frequency, start, min(end, fund.endDate or end))
-        if due_dates:
-            future_funding.append(fund)
         for when in due_dates:
             scheduled_income[(when - now).days] += fund.amount
-            ledger.append({"date": when.isoformat(), "label": fund.name, "amount": money(fund.amount), "direction": "income", "origin": "Your plan"})
-    planned_pay = any(f.type == "Earned" for f in future_funding)
-    streams = recurring_streams(transactions, now, end)
+            if fund.type in {"Repayable", "Non-repayable"}:
+                protected_income[(when - now).days] += fund.amount
+            ledger.append({"date": when.isoformat(), "label": fund.name, "amount": money(fund.amount), "direction": "income", "origin": "Your plan", "accountId": fund.accountId})
+    planned_pay = uses_work_schedule(request)
+    if planned_pay:
+        warnings.append("Job income follows your saved pay schedule, including its end dates. No historical wages are added in gaps between jobs. Include every job you expect to keep.")
+    streams = recurring_streams([t for t in transactions if t.forecastTreatment == "automatic"], now, end)
     excluded_ids = set()
     for stream in streams:
         replaced = (stream["direction"] == "income" and planned_pay) or (stream["direction"] == "expense" and stream["category"] in overridden)
@@ -99,9 +106,9 @@ def analyze(request: ForecastRequest):
                 scheduled_expenses[(when - now).days] += amount
             else:
                 scheduled_income[(when - now).days] += amount
-            ledger.append({"date": when.isoformat(), "label": stream["merchant"], "amount": amount, "direction": stream["direction"], "origin": "Detected pattern"})
+            ledger.append({"date": when.isoformat(), "label": stream["merchant"], "amount": amount, "direction": stream["direction"], "origin": "Detected pattern", "accountId": stream["accountId"]})
 
-    residual = [t for t in transactions if t.id not in excluded_ids and
+    residual = [t for t in transactions if t.forecastTreatment != "one_off" and t.id not in excluded_ids and
                 ((t.category == "Employment Income" and t.cashFlow > 0 and not planned_pay) or
                  (t.classification != "Income" and t.category not in overridden and
                   not (t.cashFlow > 0 and t.classification == "Review")))]
@@ -135,10 +142,15 @@ def analyze(request: ForecastRequest):
         for model in (expense_model, income_model):
             model.report["trainingWeeks"] = 0
             model.report["reason"] = "Partial-history daily average only; no complete training week is available."
-    # Scenario settings, public refresh timestamps and habit labels never reshuffle random draws.
-    seed_payload = request.model_dump(mode="json", exclude={"options", "economy"})
+    if planned_pay:
+        income_model.report["reason"] = "Your work schedule replaces historical earnings. Pay stops at each saved last payday, including jobs that have already ended."
+    # Labels and evidence may change without monetary history changing. Keep common draws;
+    # a changed recurring stream still affects predictions through the model itself.
+    seed_payload = request.model_dump(mode="json", exclude={"options", "economy", "syncedAt", "lifeEvents", "savingsEligibleCash"})
     for t in seed_payload["transactions"]:
-        t.pop("habitTreatment", None)
+        for key in ["habitTreatment", "authorizedDate", "authorizedAt", "location", "paymentChannel",
+                    "merchant", "merchantKey", "merchantSource", "merchantConfidence", "detailCategory", "detailLabel", "categoryOrigin"]:
+            t.pop(key, None)
     import json
     seed = int(hashlib.sha256(json.dumps(seed_payload, sort_keys=True).encode()).hexdigest()[:8], 16)
     simulations = 400
@@ -162,6 +174,12 @@ def analyze(request: ForecastRequest):
     daily_spend = constant_daily_spend * price_factors[None, :]
     price_cost = daily_spend - constant_daily_spend
     daily_income = np.repeat(weekly_income / 7, 7, axis=1)[:, :days]
+    # Dated changes are explicit net cash assumptions, spread across active days.
+    for event in request.lifeEvents:
+        for i, when in enumerate(dates[1:]):
+            if event.start <= when <= event.end:
+                daily_income[:, i] += event.weeklyIncomeChange / 7
+                daily_spend[:, i] = np.maximum(0, daily_spend[:, i] + event.weeklyExpenseChange / 7)
     net = daily_income - daily_spend + scheduled_income[None, 1:] - scheduled_expenses[None, 1:]
     balances = np.column_stack([np.full(simulations, opening), opening + np.cumsum(net, axis=1)])
     constant_balances = balances + np.column_stack([np.zeros(simulations), np.cumsum(price_cost, axis=1)])
@@ -201,7 +219,13 @@ def analyze(request: ForecastRequest):
                         "successRate": money(np.mean(available >= 0) * 100) if within and can_score else None,
                         "scenarioSuccessRate": money(np.mean(scenario_balances[:, idx] >= buffer) * 100) if within and can_score else None})
 
-    goals, weekly_room = allocate_goals(request, dates, balances, scenario_balances, constant_balances, buffer, known_cash, can_score)
+    # Cash forecasts still include funding for school costs. Personal goal forecasts
+    # protect loan/education/unreviewed cash and future grant/loan deposits separately.
+    # Conservatively charge all spending to personal cash until the next review.
+    savings_reserve = (max(0, cash - request.savingsEligibleCash) + np.cumsum(protected_income)
+                       if request.savingsEligibleCash is not None else np.zeros(days + 1))
+    savings_balances = balances - savings_reserve[None, :]
+    goals, weekly_room = allocate_goals(request, dates, savings_balances, scenario_balances - savings_reserve[None, :], constant_balances - savings_reserve[None, :], buffer, known_cash, can_score)
     category_stats, anomalies = spending_patterns(transactions, now)
     low_hits = np.where(quantiles[1] < buffer)[0]
     next30 = min(30, days)
@@ -219,6 +243,7 @@ def analyze(request: ForecastRequest):
         recommendations.append({"title": "Add a tuition deadline", "detail": "Enter a tuition amount and due date here, or add it to your semester plan, to calculate its funding gap.", "action": "tuition"})
     if not enough_history:
         recommendations.append({"title": "Build a longer spending history", "detail": "Sync available history and confirm your categories. At least four weeks are needed for simulated readiness scores; learned models need more history and must outperform a baseline.", "action": "settings"})
+    liquidity = liquidity_report(request, dates, balances, buffer, can_score, known_cash, ledger, transactions, savings_balances)
     summary = {"cash": money(cash) if known_cash else None, "creditReserve": money(credit_reserve),
                "pendingReserve": money(pending_reserve), "goalReserve": money(goal_reserve), "buffer": money(request.minimumBalance),
                "startingUsableCash": money(opening) if known_cash else None,
@@ -229,12 +254,18 @@ def analyze(request: ForecastRequest):
                "bufferBreachRate": money(np.mean(np.any(balances < buffer, axis=1)) * 100) if can_score else None,
                "safeWeeklyRoom": weekly_room}
     return {"version": VERSION, "asOf": now.isoformat(), "source": request.source, "horizonDays": days, "syncedAt": request.syncedAt,
-            "quality": {"historyDays": history_days, "completeWeeks": weeks, "transactionCount": len(eligible),
+            "quality": {"historyDays": history_days, "completeWeeks": weeks, "transactionCount": len({t.eventId or t.id for t in eligible}),
                         "excludedCount": len(request.transactions) - len(transactions), "cashKnown": known_cash,
                         "level": "limited" if not enough_history else "developing" if weeks < 16 else "established",
                         "warnings": warnings},
             "summary": summary, "timeline": timeline, "tuition": tuition, "goals": goals,
+            "student": student_outlook(request, dates, balances, daily_spend, daily_income, scheduled_expenses, scheduled_income, known_cash, buffer),
             "economy": prices.report(price_totals, min(history_days, 90), price_cost), "habits": habits,
+            "behavior": analyze_behavior(request),
+            "liquidity": liquidity,
+            "weeklyPlan": action_plan(request, ledger, liquidity, daily_spend, scheduled_expenses, scheduled_income, known_cash, transactions),
+            "accountOutlooks": account_outlooks(request, ledger, transactions, excluded_ids, overridden),
+            "lifeEvents": [e.model_dump(mode="json") for e in request.lifeEvents],
             "models": [expense_model.report, income_model.report],
             "recurring": [{k: v for k, v in s.items() if k not in {"ids", "dates"}} for s in streams],
             "categories": category_stats, "anomalies": anomalies, "upcoming": sorted(ledger, key=lambda e: (e["date"], e["label"]))[:30],
@@ -246,8 +277,9 @@ def analyze(request: ForecastRequest):
                 "Current CAD cash is the starting balance. Credit balances, pending outflows, and existing goal savings are reserved. Investment and loan balances are not cash.",
                 "Monthly expense plans replace learned spending in their category. Tuition uses entered dates only. Other one-time expenses are additional future obligations.",
                 "Future confirmed funding and expected earned funding are included. Received money is already in the starting balance; applied or unconfirmed non-earned funding is excluded.",
-                "Entered future earned funding replaces detected and learned employment income. Historical grants, loans, gifts, transfers, card repayments, and refunds are not recurring earnings.",
+                "Saved earned funding or a confirmed work schedule replaces detected and learned employment income across the full outlook, even after a job ends. Gaps have no job pay unless another saved job covers them. Grants, loans, dated changes and what-if income remain separate.",
                 "Goals share one cash pool in priority/deadline order and protect the lowest remaining forecast balance through the horizon. Existing saved goal amounts must already be part of starting cash.",
+                "Personal savings estimates use bank cash minus detected or flagged non-personal funding and future confirmed grant and loan deposits. Other bank cash is personal by default. A what-if opening balance is excluded from personal savings estimates.",
                 "Tuition readiness tests cash after the bill, buffer, and existing savings reserves. Its first cash coverage date can be temporary; check the deadline result as well.",
                 "A complete view requires all relevant accounts. Earliest observed activity does not prove uninterrupted coverage. An empty day in imported history is treated as no activity.",
                 "The what-if path adds your assumed extra income and reduces only modeled variable flexible spending. It changes no saved plan and makes no payments.",

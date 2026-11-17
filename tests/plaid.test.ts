@@ -102,6 +102,38 @@ describe('Plaid synchronization and token protection', () => {
     const demo = { ...normalize(tx('demo')), source: 'demo' as const };
     assert.equal(applySync([demo], [page([tx('plaid')])], []).length, 2);
   });
+  it('retains bank authorization time when pending removal precedes posting on another page', () => {
+    const pending = normalize({
+      ...tx('pending'),
+      pending: true,
+      authorized_date: '2026-09-15',
+      authorized_datetime: '2026-09-15T20:45:00-04:00',
+    });
+    const removal = { ...page(), removed: [{ transaction_id: 'pending' }] };
+    const posted = {
+      ...tx('posted'),
+      pending_transaction_id: 'pending',
+      authorized_date: null,
+      authorized_datetime: null,
+    };
+    const result = applySync([pending], [removal, page([posted])], []);
+    assert.equal(result.length, 1);
+    assert.equal(result[0].authorizedAt, pending.authorizedAt);
+    assert.equal(result[0].authorizedDate, pending.authorizedDate);
+    assert.equal(result[0].date, posted.date);
+    assert.equal(result[0].pending, false);
+    const resynced = applySync(result, [{ ...page(), modified: [posted] }], []);
+    assert.equal(resynced[0].authorizedAt, pending.authorizedAt);
+    const corrected = normalize(
+      { ...posted, authorized_datetime: '2026-09-15T21:00:00-04:00' },
+      [],
+      result[0],
+    );
+    assert.equal(corrected.authorizedAt, '2026-09-15T21:00:00-04:00');
+    assert.equal(normalize(tx('unrelated'), [], pending).authorizedAt, null);
+    assert.equal(normalize(posted, [], { ...pending, accountId: 'another' }).authorizedAt, null);
+    assert.equal(normalize(posted, [], { ...pending, source: 'demo' }).authorizedAt, null);
+  });
   it('encrypts access tokens with authenticated, randomized encryption', () => {
     const key = randomBytes(32);
     const token = 'access-sandbox-test-only';

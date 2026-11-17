@@ -1,6 +1,8 @@
 import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
 import { categorySchema, workspaceSchema } from '../../../shared/schema';
+import { correctionExtras, validDetail } from '../../../shared/merchants';
+import { reviewFields } from '../../../shared/transaction-review';
 import type { PostgresWorkspace } from '../repositories/postgres-workspace';
 import type { WorkspaceRepository } from '../repositories/workspace-repository';
 import { PlaidService } from '../services/plaid-service';
@@ -8,10 +10,28 @@ import { TransactionService } from '../services/transaction-service';
 import { AuthError } from '../services/auth-service';
 import { forecast } from '../services/intelligence-service';
 import { recordForecast } from '../services/forecast-history';
+import {
+  enrichmentSnapshot,
+  requestEnrichment,
+  applyEnrichment,
+  enrichmentStatus,
+} from '../services/merchant-enrichment';
 
 /** Responses are sent only after the user's database transaction commits. */
 export function postgresWorkspaceRoutes(workspaces: PostgresWorkspace, key: Buffer) {
   const router = Router();
+  router.post('/transactions/enrichment', async (_req, res) => {
+    const id = res.locals.user?.id as string | undefined;
+    if (!id) throw new AuthError('Sign in to review merchants.', 401);
+    const snapshot = await workspaces.run(id, (repo) => enrichmentSnapshot(repo));
+    const response = await requestEnrichment(snapshot);
+    res.json(
+      await workspaces.run(id, (repo) => {
+        applyEnrichment(repo, snapshot, response);
+        return { state: repo.state(), ...enrichmentStatus(repo) };
+      }),
+    );
+  });
   router.post('/intelligence/forecast', async (req, res) => {
     const id = res.locals.user?.id as string | undefined;
     if (!id) throw new AuthError('Sign in to access forecasts.', 401);
@@ -22,7 +42,11 @@ export function postgresWorkspaceRoutes(workspaces: PostgresWorkspace, key: Buff
     }));
     res.setHeader('Cache-Control', 'no-store');
     const report = await forecast(snapshot.state, req.body, snapshot.syncedAt);
-    res.json(await workspaces.run(id, (repository) => recordForecast(repository, snapshot.state, req.body, report)));
+    res.json(
+      await workspaces.run(id, (repository) =>
+        recordForecast(repository, snapshot.state, req.body, report),
+      ),
+    );
   });
   type Operation = (
     repository: WorkspaceRepository,
@@ -44,11 +68,22 @@ export function postgresWorkspaceRoutes(workspaces: PostgresWorkspace, key: Buff
     '/state',
     handle((repository) => repository.state()),
   );
-  router.patch('/intelligence/habits/:id', handle((repository, _plaid, req) => {
-    const input = z.object({ treatment: z.enum(['automatic', 'routine', 'optional']) }).strict().parse(req.body);
-    if (!repository.setHabitTreatment(String(req.params.id), input.treatment)) throw new AuthError('Transaction not found.', 404);
-    return repository.state();
-  }));
+  router.get(
+    '/transactions/enrichment',
+    handle((repo) => enrichmentStatus(repo)),
+  );
+  router.patch(
+    '/intelligence/habits/:id',
+    handle((repository, _plaid, req) => {
+      const input = z
+        .object({ treatment: z.enum(['automatic', 'routine', 'optional']) })
+        .strict()
+        .parse(req.body);
+      if (!repository.setHabitTreatment(String(req.params.id), input.treatment))
+        throw new AuthError('Transaction not found.', 404);
+      return repository.state();
+    }),
+  );
   router.put(
     '/workspace',
     handle((repository, plaid, req) => {
@@ -91,7 +126,14 @@ export function postgresWorkspaceRoutes(workspaces: PostgresWorkspace, key: Buff
             .enum(['Essential', 'Flexible', 'Discretionary', 'Transfer', 'Income', 'Review'])
             .optional(),
           saveRule: z.boolean().default(false),
+          ...correctionExtras,
+          ...reviewFields,
         })
+        .strict()
+        .refine(
+          (input) => validDetail(input.category, input.detailCategory),
+          'Choose a detail within the selected category.',
+        )
         .parse(req.body);
       if (!new TransactionService(repository).correct(String(req.params.id), input))
         throw new AuthError('Transaction not found.', 404);
@@ -159,6 +201,17 @@ export function postgresWorkspaceRoutes(workspaces: PostgresWorkspace, key: Buff
     '/plaid/item',
     handle(async (repository, plaid) => {
       await plaid.disconnect();
+      return repository.state();
+    }),
+  );
+  router.post(
+    '/plaid/trial-refresh',
+    handle(async (repository, plaid, req) => {
+      const { kind } = z
+        .object({ kind: z.enum(['transactions', 'balance']) })
+        .strict()
+        .parse(req.body);
+      await plaid.trialRefresh(kind);
       return repository.state();
     }),
   );

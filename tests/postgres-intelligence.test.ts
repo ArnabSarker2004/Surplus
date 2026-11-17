@@ -48,6 +48,10 @@ describe('PostgreSQL forecast isolation', { skip: !process.env.DATABASE_URL }, (
     const previousToken = process.env.INTELLIGENCE_SERVICE_TOKEN;
     process.env.INTELLIGENCE_SERVICE_TOKEN = 'test-only-private-intelligence-token';
     const sources: string[] = [];
+    const versions = await pool.query(
+      'SELECT id,xmin::text AS version FROM surplus.transactions WHERE user_id=$1 ORDER BY id',
+      [ids[0]],
+    );
     try {
       global.fetch = async (_url, options) => {
         const payload = JSON.parse(String(options?.body));
@@ -70,6 +74,30 @@ describe('PostgreSQL forecast isolation', { skip: !process.env.DATABASE_URL }, (
           .send({})
           .expect(200);
       assert.deepEqual(sources, ['demo', 'manual']);
+      assert.deepEqual(
+        (
+          await pool.query(
+            'SELECT id,xmin::text AS version FROM surplus.transactions WHERE user_id=$1 ORDER BY id',
+            [ids[0]],
+          )
+        ).rows,
+        versions.rows,
+      );
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        await client.query('SET LOCAL ROLE surplus_runtime');
+        await client.query("SELECT set_config('surplus.user_id',$1,true)", [ids[1]]);
+        assert.deepEqual(
+          (await client.query('SELECT user_id FROM surplus.forecast_history')).rows.map(
+            (r) => r.user_id,
+          ),
+          [ids[1]],
+        );
+      } finally {
+        await client.query('ROLLBACK');
+        client.release();
+      }
       await request(app)
         .post('/api/intelligence/forecast')
         .set('Cookie', cookies[1])
@@ -80,6 +108,143 @@ describe('PostgreSQL forecast isolation', { skip: !process.env.DATABASE_URL }, (
       global.fetch = previousFetch;
       if (previousToken === undefined) delete process.env.INTELLIGENCE_SERVICE_TOKEN;
       else process.env.INTELLIGENCE_SERVICE_TOKEN = previousToken;
+    }
+  });
+  it('never lets a second user relabel the first user transactions', async () => {
+    const own = await workspaces.run(ids[0], (repository) => repository.state().transactions[0]);
+    await request(app)
+      .patch(`/api/intelligence/habits/${own.id}`)
+      .set('Cookie', cookies[1])
+      .send({ treatment: 'routine' })
+      .expect(404);
+    await request(app)
+      .patch(`/api/intelligence/habits/${own.id}`)
+      .set('Cookie', cookies[0])
+      .send({ treatment: 'routine' })
+      .expect(200);
+    assert.equal(
+      (await workspaces.run(ids[0], (repository) => repository.state().transactions[0]))
+        .habitTreatment,
+      'routine',
+    );
+  });
+  it('persists merchant and detail corrections per user and rejects mismatched detailed categories', async () => {
+    const own = await workspaces.run(ids[0], (repository) => repository.state().transactions[0]);
+    const body = {
+      category: 'Coffee',
+      merchantOverride: 'Confirmed test coffee company',
+      detailCategory: 'FOOD_AND_DRINK_COFFEE',
+      saveRule: true,
+    };
+    await request(app)
+      .patch(`/api/transactions/${own.id}`)
+      .set('Cookie', cookies[1])
+      .send(body)
+      .expect(404);
+    await request(app)
+      .patch(`/api/transactions/${own.id}`)
+      .set('Cookie', cookies[0])
+      .send({ ...body, category: 'Housing' })
+      .expect(400);
+    await request(app)
+      .patch(`/api/transactions/${own.id}`)
+      .set('Cookie', cookies[0])
+      .send(body)
+      .expect(200);
+    const state = await workspaces.run(ids[0], (repository) => repository.state());
+    const saved = state.transactions.find((t) => t.id === own.id)!;
+    assert.equal(saved.merchantOverride, body.merchantOverride);
+    assert.equal(saved.detailCategory, body.detailCategory);
+    assert.equal(saved.description, own.description);
+    assert.equal(saved.cashFlow, own.cashFlow);
+    assert.ok(
+      state.rules.some((r) => r.merchantOverride === body.merchantOverride && r.merchantKey),
+    );
+    assert.equal(
+      (await workspaces.run(ids[1], (repository) => repository.state())).transactions.length,
+      0,
+    );
+  });
+  it('isolates forecast observations with database RLS and does not rewrite financial rows', async () => {
+    const before = await pool.query(
+      'SELECT id,xmin::text AS version FROM surplus.transactions WHERE user_id=$1 ORDER BY id',
+      [ids[0]],
+    );
+    await workspaces.run(ids[0], (repository) =>
+      repository.store.set('intelligenceJournal', {
+        observations: [{ date: '2026-09-20', source: 'demo', cash: 100 }],
+        predictions: [],
+      }),
+    );
+    const after = await pool.query(
+      'SELECT id,xmin::text AS version FROM surplus.transactions WHERE user_id=$1 ORDER BY id',
+      [ids[0]],
+    );
+    assert.deepEqual(after.rows, before.rows);
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('SET LOCAL ROLE surplus_runtime');
+      await client.query("SELECT set_config('surplus.user_id',$1,true)", [ids[1]]);
+      assert.equal(
+        (
+          await client.query('SELECT * FROM surplus.intelligence_journal WHERE user_id=$1', [
+            ids[0],
+          ])
+        ).rowCount,
+        0,
+      );
+      await assert.rejects(
+        client.query('INSERT INTO surplus.intelligence_journal(user_id,payload) VALUES($1,$2)', [
+          ids[0],
+          {},
+        ]),
+      );
+    } finally {
+      await client.query('ROLLBACK');
+      client.release();
+    }
+  });
+  it('keeps merchant caches private and cache-only writes preserve transaction rows', async () => {
+    const before = await pool.query(
+      'SELECT id,xmin::text AS version FROM surplus.transactions WHERE user_id=$1 ORDER BY id',
+      [ids[0]],
+    );
+    await workspaces.run(ids[0], (repo) =>
+      repo.store.set('merchantEnrichment', { entries: { test: { merchant: 'Private test' } } }),
+    );
+    assert.deepEqual(
+      (
+        await pool.query(
+          'SELECT id,xmin::text AS version FROM surplus.transactions WHERE user_id=$1 ORDER BY id',
+          [ids[0]],
+        )
+      ).rows,
+      before.rows,
+    );
+    assert.deepEqual(
+      await workspaces.run(ids[1], (repo) => repo.store.get('merchantEnrichment', {})),
+      { entries: {} },
+    );
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('SET LOCAL ROLE surplus_runtime');
+      await client.query("SELECT set_config('surplus.user_id',$1,true)", [ids[1]]);
+      assert.equal(
+        (await client.query('SELECT * FROM surplus.merchant_enrichment WHERE user_id=$1', [ids[0]]))
+          .rowCount,
+        0,
+      );
+      await assert.rejects(
+        client.query('INSERT INTO surplus.merchant_enrichment(user_id,payload) VALUES($1,$2)', [
+          ids[0],
+          {},
+        ]),
+      );
+    } finally {
+      await client.query('ROLLBACK');
+      client.release();
     }
   });
 });

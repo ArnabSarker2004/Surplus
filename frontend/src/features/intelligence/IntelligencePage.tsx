@@ -1,778 +1,459 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  BrainCircuit,
-  CalendarClock,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  BarChart3,
+  CircleHelp,
+  CreditCard,
+  LayoutGrid,
   RefreshCw,
-  ShieldCheck,
-  Sparkles,
-  TrendingUp,
+  Target,
+  Wallet,
+  BriefcaseBusiness,
+  CalendarDays,
+  SlidersHorizontal,
 } from 'lucide-react';
-import {
-  Area,
-  CartesianGrid,
-  ComposedChart,
-  Line,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
 import {
   defaultForecastOptions,
   type ForecastOptions,
   type ForecastReport,
 } from '../../../../shared/intelligence';
-import { cad, prettyDate } from '../../../../shared/finance';
-import {
-  Badge,
-  Button,
-  Empty,
-  Field,
-  MoneyInput,
-  PageHead,
-  Progress,
-  SectionTitle,
-} from '../../components/ui';
-import { chartMoney } from '../../components/chart-format';
+import { prettyDate } from '../../../../shared/finance';
+import { Badge, Button, Modal, PageHead, SectionTitle } from '../../components/ui';
 import { api, useApp } from '../../lib';
-import './intelligence.css';
 import { CreditCardMatches } from './CreditCardMatches';
 import { ForecastInsights, ModelStatus } from './ForecastInsights';
+import { ForecastChart, money } from './ForecastCharts';
+import { ForecastControls } from './ForecastControls';
+import { GoalTimelines } from './GoalTimelines';
+import { BehaviorPanel } from './BehaviorPanel';
+import { EconomyPanel } from './EconomyPanel';
+import { LiquidityPanel } from './LiquidityPanel';
+import { WeeklyActionPlan } from './WeeklyActionPlan';
+import { QuickReview } from './QuickReview';
+import { WorkSchedule } from './WorkSchedule';
+import { StudentSnapshot } from './StudentSnapshot';
+import { ForecastAccuracy, AccountForecasts } from './ForecastAccuracy';
+import { CashReserveCard, CashWeekCard, SpendingMix } from './OutlookStats';
+import { reviewQueue } from '../../../../shared/transaction-review';
+import { MerchantEnrichment } from '../transactions/MerchantEnrichment';
+import { StudentMoney } from '../../components/StudentMoney';
+import './intelligence.css';
 
-const amount = (value: number | null) => (value === null ? 'Not enough data' : cad(value));
-export function IntelligencePage() {
+const tabs = [
+  ['outlook', 'My semester', LayoutGrid],
+  ['work', 'Work & study', BriefcaseBusiness],
+  ['cash', 'Cash flow', Wallet],
+  ['goals', 'My goals', Target],
+  ['habits', 'Spending habits', BarChart3],
+  ['cards', 'Card options', CreditCard],
+  ['week', 'This week', CalendarDays],
+] as const;
+type Tab = (typeof tabs)[number][0] | 'details';
+export function IntelligencePage({ initialTab = 'outlook' }: { initialTab?: Tab }) {
   const { w, state, navigate, demo } = useApp();
   const [options, setOptions] = useState<ForecastOptions>(defaultForecastOptions);
   const [report, setReport] = useState<ForecastReport | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [customTuition, setCustomTuition] = useState(false);
-  const [tuitionAmount, setTuitionAmount] = useState(0);
-  const [tuitionDate, setTuitionDate] = useState(
-    w.expenses.find((e) => e.category === 'Tuition and School')?.date || w.semester.end,
-  );
-  const [manualCash, setManualCash] = useState(false);
-  const [cash, setCash] = useState(0);
-  const [topic, setTopic] = useState('tuition');
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [changed, setChanged] = useState(false);
+  const [topic, setTopic] = useState('tuition');
+  const [controlsOpen, setControlsOpen] = useState(false);
+  const [cashView, setCashView] = useState('balance');
+  const [reviewOpen, setReviewOpen] = useState(false);
   const generation = useRef(0);
-  // Explicitly discard stale responses when switching account/source or leaving the page.
-  useEffect(
-    () => () => {
-      generation.current += 1;
-    },
-    [],
-  );
-  const run = async () => {
-    if (busy) return;
-    const current = ++generation.current;
-    setBusy(true);
-    setError('');
-    try {
-      const next = demo
-        ? ((await import('./demo-forecast.json')).default as ForecastReport)
-        : await api<ForecastReport>('/intelligence/forecast', 'POST', {
-            ...options,
-            openingCash: manualCash ? cash : null,
-            tuition: customTuition ? { amount: tuitionAmount, dueDate: tuitionDate } : null,
-          });
-      if (generation.current === current) {
-        setReport(next);
-        setChanged(false);
-      }
-    } catch (e) {
-      if (generation.current === current) setError((e as Error).message);
-    } finally {
-      if (generation.current === current) setBusy(false);
-    }
+  const forecastFlight = useRef<Promise<void> | null>(null);
+  const reportSource = useRef(w.source);
+  const appliedOptions = useRef(defaultForecastOptions);
+  const draftOptions = useRef(defaultForecastOptions);
+  const navigation = useRef<HTMLElement>(null);
+  const show = (next: Tab) => {
+    setTab(next);
+    navigation.current?.scrollIntoView({ block: 'nearest' });
   };
+  const openReview = () => {
+    setReviewOpen(true);
+  };
+  const run = useCallback(
+    async (input: ForecastOptions) => {
+      const current = ++generation.current;
+      setBusy(true);
+      setError('');
+      const previous = forecastFlight.current;
+      const task = (async () => {
+        // Cleanup and quick edits can change state together. Finish the current request,
+        // then calculate only the newest waiting state instead of saturating Python.
+        if (previous) await previous;
+        if (generation.current !== current) return;
+        try {
+          const next = demo
+            ? ((await import('./demo-forecast.json')).default as ForecastReport)
+            : await api<ForecastReport>('/intelligence/forecast', 'POST', input);
+          if (generation.current === current) {
+            setReport(next);
+            appliedOptions.current = input;
+            setChanged(JSON.stringify(draftOptions.current) !== JSON.stringify(input));
+          }
+        } catch (e) {
+          if (generation.current === current) setError((e as Error).message);
+        } finally {
+          if (generation.current === current) setBusy(false);
+        }
+      })();
+      forecastFlight.current = task;
+      await task;
+      if (forecastFlight.current === task) forecastFlight.current = null;
+    },
+    [demo],
+  );
+  useEffect(() => {
+    if (reportSource.current !== w.source) setReport(null);
+    reportSource.current = w.source;
+    void run(appliedOptions.current);
+    return () => {
+      generation.current += 1;
+    };
+  }, [run, state.transactions, state.accounts, w]);
+  useEffect(() => {
+    setTab(initialTab);
+  }, [initialTab]);
   const update = (patch: Partial<ForecastOptions>) => {
-    setOptions({ ...options, ...patch });
+    const next = { ...draftOptions.current, ...patch };
+    draftOptions.current = next;
+    setOptions(next);
     setChanged(true);
   };
-  const chart = report?.timeline.map((point) => ({
-    ...point,
-    band: point.low === null || point.high === null ? null : [point.low, point.high],
-  }));
+  const tryHabit = (habitAdjustment: ForecastOptions['habitAdjustment']) => {
+    const next = { ...appliedOptions.current, habitAdjustment };
+    draftOptions.current = next;
+    setOptions(next);
+    show('goals');
+    void run(next);
+  };
   const explanation = report?.assistant.find((item) => item.id === topic);
+  const reviewRows = reviewQueue(state.transactions, report?.asOf);
+  const reviewCount = reviewRows.length;
   return (
-    <>
+    <div className="forecast-workspace">
       <PageHead
-        eyebrow="YOUR FINANCIAL INTELLIGENCE"
-        title="See a little further ahead."
-        description="Forecast your cash flow. Understand your tuition gap. Give every goal a realistic path."
+        eyebrow="YOUR MONEY, THROUGH EVERY TERM"
+        title="Money outlook"
+        description="From co-op paydays to tuition deadlines. See what carries you through."
         action={
-          <Badge tone={w.source === 'demo' ? 'amber' : 'green'}>
-            <ShieldCheck size={14} />{' '}
-            {w.source === 'demo' ? 'Fictional demo data' : 'Private, local analysis'}
-          </Badge>
+          <div className="button-row">
+            <Button variant="secondary" onClick={() => setControlsOpen(true)}>
+              <SlidersHorizontal size={15} /> Try a change
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => void run(appliedOptions.current)}
+              disabled={busy}
+            >
+              <RefreshCw size={15} className={busy ? 'spin' : ''} aria-hidden="true" />
+              Refresh outlook
+            </Button>
+          </div>
         }
       />
-      <section className="intelligence-intro">
-        <div>
-          <BrainCircuit size={27} />
-          <h2>A forecast built around your life.</h2>
-          <p>
-            Your transaction patterns meet your planned bills and funding. Models train on your
-            workspace only; no transaction data goes to an external AI provider.
-          </p>
-        </div>
-        <div className="intelligence-intro-facts">
-          <strong>
-            {state.transactions.filter((t) => !t.pending && t.currency === 'CAD').length}
-          </strong>
-          <span>posted CAD transactions available</span>
-          <small>Sync your bank in Settings for the latest snapshot.</small>
-        </div>
-      </section>
       {demo && (
         <p className="inline-notice">
-          This is a fixed sample generated by the Python service from Alex’s original demo data.
-          Demo edits do not rebuild it. Sign in to run models on your own plan.
+          This is a fixed sample outlook with fictional data. Reviews update your demo money
+          breakdown; sign in for an outlook that recalculates with your plan.
         </p>
       )}
-      <form
-        className="card intelligence-controls"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void run();
-        }}
-      >
-        <fieldset disabled={busy || demo}>
-          <SectionTitle
-            title="Shape your forecast"
-            subtitle="Start with your saved plan, then explore a different outcome."
+      <div className="forecast-toolbar">
+        <nav className="forecast-tabs" aria-label="Money outlook sections" ref={navigation}>
+          {tabs.map(([id, label, Icon]) => (
+            <button
+              type="button"
+              key={id}
+              aria-current={tab === id ? 'page' : undefined}
+              aria-controls="outlook-content"
+              onClick={() => show(id)}
+            >
+              <Icon size={18} aria-hidden="true" />
+              {label}
+            </button>
+          ))}
+        </nav>
+      </div>
+      {controlsOpen && (
+        <Modal title="Try a change" onClose={() => setControlsOpen(false)}>
+          <ForecastControls
+            options={options}
+            update={update}
+            run={() => {
+              void run(options);
+              setControlsOpen(false);
+              show('cash');
+            }}
+            busy={busy}
+            demo={!!demo}
+            endDate={w.semester.end}
+            reset={() => {
+              draftOptions.current = defaultForecastOptions;
+              setOptions(defaultForecastOptions);
+              void run(defaultForecastOptions);
+            }}
           />
-          <div className="intelligence-control-grid">
-            <Field label="Look ahead">
-              <select
-                value={options.horizonDays}
-                onChange={(e) => update({ horizonDays: Number(e.target.value) })}
-              >
-                <option value={30}>30 days</option>
-                <option value={90}>90 days</option>
-                <option value={180}>6 months</option>
-                <option value={365}>1 year</option>
-              </select>
-            </Field>
-            <Field label="Extra monthly income" hint="A what-if assumption, not confirmed pay.">
-              <MoneyInput
-                value={options.monthlyExtraIncome}
-                max={100_000}
-                onChange={(value) => update({ monthlyExtraIncome: value })}
-              />
-            </Field>
-            <Field label="Reduce flexible spending">
-              <select
-                value={options.flexibleReductionPercent}
-                onChange={(e) => update({ flexibleReductionPercent: Number(e.target.value) })}
-              >
-                {[0, 5, 10, 15, 20, 30, 50, 80].map((v) => (
-                  <option value={v} key={v}>
-                    {v === 0 ? 'Keep current habits' : `${v}% less`}
-                  </option>
-                ))}
-              </select>
-            </Field>
-          </div>
-          <details className="intelligence-input-details">
-            <summary>Tuition target & cash assumptions</summary>
-            <label className="intelligence-check">
-              <input
-                type="checkbox"
-                checked={customTuition}
-                onChange={(e) => {
-                  setCustomTuition(e.target.checked);
-                  setChanged(true);
-                }}
-              />{' '}
-              Explore a different tuition bill
-            </label>
-            {customTuition && (
-              <div className="intelligence-control-grid">
-                <Field label="Tuition amount">
-                  <MoneyInput
-                    value={tuitionAmount}
-                    min={0.01}
-                    onChange={(value) => {
-                      setTuitionAmount(value);
-                      setChanged(true);
-                    }}
-                  />
-                </Field>
-                <Field label="Tuition due date">
-                  <input
-                    type="date"
-                    required
-                    value={tuitionDate}
-                    onChange={(e) => {
-                      setTuitionDate(e.target.value);
-                      setChanged(true);
-                    }}
-                  />
-                </Field>
-                <p className="field-note">
-                  Replaces saved tuition bills for this forecast only. Your semester plan stays
-                  unchanged.
-                </p>
-              </div>
-            )}
-            <label className="intelligence-check">
-              <input
-                type="checkbox"
-                checked={manualCash}
-                onChange={(e) => {
-                  setManualCash(e.target.checked);
-                  setChanged(true);
-                }}
-              />{' '}
-              Use my own current cash balance
-            </label>
-            {manualCash && (
-              <Field
-                label="Total current cash"
-                hint="Include money already earmarked for goals. Credit and pending outflows are reserved separately."
-              >
-                <MoneyInput
-                  value={cash}
-                  onChange={(value) => {
-                    setCash(value);
-                    setChanged(true);
-                  }}
-                />
-              </Field>
-            )}
-          </details>
-          <details className="intelligence-input-details">
-            <summary>Credit card comparison assumptions</summary>
-            <div className="intelligence-control-grid">
-              <Field label="Do you pay card statements in full?">
-                <select
-                  value={options.cardPreferences.paidInFull}
-                  onChange={(e) =>
-                    update({
-                      cardPreferences: {
-                        ...options.cardPreferences,
-                        paidInFull: e.target.value as 'unknown' | 'yes' | 'no',
-                      },
-                    })
-                  }
-                >
-                  <option value="unknown">Not specified</option>
-                  <option value="yes">Yes, every month</option>
-                  <option value="no">No, I carry a balance</option>
-                </select>
-              </Field>
-              <Field
-                label="Spending where Amex is accepted"
-                hint="An assumption you control; Plaid cannot verify merchant acceptance."
-              >
-                <select
-                  value={options.cardPreferences.amexAcceptancePercent}
-                  onChange={(e) =>
-                    update({
-                      cardPreferences: {
-                        ...options.cardPreferences,
-                        amexAcceptancePercent: Number(e.target.value),
-                      },
-                    })
-                  }
-                >
-                  {[100, 75, 50, 25, 0].map((v) => (
-                    <option key={v} value={v}>
-                      {v}% of eligible purchases
-                    </option>
-                  ))}
-                </select>
-              </Field>
-            </div>
-            <label className="intelligence-check">
-              <input
-                type="checkbox"
-                checked={options.cardPreferences.tangerineSavings}
-                onChange={(e) =>
-                  update({
-                    cardPreferences: {
-                      ...options.cardPreferences,
-                      tangerineSavings: e.target.checked,
-                    },
-                  })
-                }
-              />
-              I would deposit Tangerine rewards into its savings account (third bonus category)
-            </label>
-            <label className="intelligence-check">
-              <input
-                type="checkbox"
-                checked={options.cardPreferences.recurringBills}
-                onChange={(e) =>
-                  update({
-                    cardPreferences: {
-                      ...options.cardPreferences,
-                      recurringBills: e.target.checked,
-                    },
-                  })
-                }
-              />
-              My phone, internet and subscription bills qualify as pre-authorized card payments
-            </label>
-          </details>
-        </fieldset>
-        <div className="intelligence-run">
-          <Button type="submit" disabled={busy}>
-            <RefreshCw size={16} className={busy ? 'spin' : ''} />
-            {busy ? 'Learning your patterns…' : report ? 'Update forecast' : 'Build my forecast'}
-          </Button>
-          <span role="status">
-            {busy
-              ? 'Testing models and simulating possible cash-flow paths.'
-              : changed && report
-                ? 'Assumptions changed. Update the forecast to apply them.'
-                : 'No money is moved. Nothing is added to your saved plan.'}
-          </span>
-        </div>
-      </form>
+        </Modal>
+      )}
+      {changed && (
+        <p role="status" className="inline-notice">
+          Your changes aren’t applied yet. Open “Try a change” to update your outlook.
+        </p>
+      )}
+      {busy && (
+        <p role="status" className="forecast-loading">
+          <RefreshCw size={18} className="spin" />
+          {report ? 'Updating your outlook…' : 'Looking at your spending and upcoming bills…'}
+        </p>
+      )}
       {error && (
         <div className="form-error" role="alert">
           {error}
+          {report ? ' The displayed report is the previous successful snapshot.' : ''}{' '}
+          <Button variant="secondary" onClick={() => void run(options)} disabled={busy}>
+            Try again
+          </Button>
         </div>
-      )}
-      {!report && !busy && !error && (
-        <Empty
-          title="Your next chapter, with a little more foresight."
-          detail="Build a forecast to see tuition readiness, savings timelines, recurring bills, and model-tested spending projections."
-        />
       )}
       {report && (
-        <div
-          className={busy ? 'intelligence-results updating' : 'intelligence-results'}
-          aria-busy={busy}
-        >
-          <div className="intelligence-quality">
+        <div className={`intelligence-results ${busy ? 'updating' : ''}`} aria-busy={busy}>
+          <div className="intelligence-quality outlook-freshness">
             <Badge tone={report.quality.level === 'limited' ? 'amber' : 'green'}>
-              {report.quality.level} history
+              {report.source === 'demo'
+                ? 'Sample data'
+                : report.quality.level === 'limited'
+                  ? 'Building your picture'
+                  : 'Based on your history'}
             </Badge>
+            <span>Updated for {prettyDate(report.asOf)}</span>
             <span>
-              {report.quality.historyDays} observed days · {report.quality.completeWeeks} complete
-              weeks · As of {report.asOf}
+              {demo
+                ? 'Fixed sample outlook'
+                : report.syncedAt
+                  ? `Bank snapshot ${new Date(report.syncedAt).toLocaleDateString()}`
+                  : 'Using your saved plan'}
             </span>
-            <span>
-              {report.syncedAt
-                ? `Bank snapshot: ${new Date(report.syncedAt).toLocaleString()}`
-                : 'No bank sync timestamp'}
-            </span>
+            <Button variant="ghost" onClick={() => navigate('settings')}>
+              Bank connections <ArrowUpRight size={14} />
+            </Button>
           </div>
-          {report.quality.warnings.length > 0 && (
-            <details className="intelligence-warnings" open={report.quality.level === 'limited'}>
-              <summary>{report.quality.warnings.length} things that affect this forecast</summary>
-              <ul>
-                {report.quality.warnings.map((warning) => (
-                  <li key={warning}>{warning}</li>
-                ))}
-              </ul>
-            </details>
-          )}
-          <ModelStatus report={report} />
-          <div className="intelligence-stats">
-            <Metric
-              label="Next 30 days · incoming"
-              value={amount(report.summary.incomeNext30)}
-              detail="Projected earnings + entered funding"
-            />
-            <Metric
-              label="Next 30 days · outgoing"
-              value={amount(report.summary.spendingNext30)}
-              detail="Modeled spending + scheduled bills"
-            />
-            <Metric
-              label="Median ending balance"
-              value={amount(report.summary.endingMedian)}
-              detail={`After ${report.horizonDays} days; credit and pending reserved`}
-            />
-            <Metric
-              label="First buffer pressure"
-              value={
-                report.summary.bufferBreachDate
-                  ? prettyDate(report.summary.bufferBreachDate)
-                  : report.quality.cashKnown
-                    ? 'None in median path'
-                    : 'Cash balance needed'
-              }
-              detail="Minimum balance + existing goal savings"
-            />
-          </div>
-          <section className="card intelligence-chart">
-            <SectionTitle
-              title="The possible paths ahead"
-              subtitle="Cash remaining after credit and pending reserves; before allocating new goal savings."
-            />
-            {report.quality.cashKnown ? (
-              <>
-                <div
-                  className="chart-wrap"
-                  role="img"
-                  aria-label={`Cash forecast ends at a median ${amount(report.summary.endingMedian)}. The shaded range shows the 10th to 90th simulated percentiles.`}
-                >
-                  <ResponsiveContainer width="100%" height={320}>
-                    <ComposedChart
-                      data={chart}
-                      margin={{ top: 20, right: 20, left: 4, bottom: 14 }}
-                    >
-                      <CartesianGrid stroke="#e4e9dc" strokeDasharray="3 5" vertical={false} />
-                      <XAxis
-                        dataKey="date"
-                        tickFormatter={prettyDate}
-                        minTickGap={45}
-                        tick={{ fontSize: 11 }}
-                        padding={{ left: 12, right: 12 }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis
-                        width={72}
-                        tickFormatter={chartMoney}
-                        tick={{ fontSize: 11 }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <Tooltip
-                        labelFormatter={(label) => String(label)}
-                        formatter={(value: number | number[], name: string) => [
-                          Array.isArray(value)
-                            ? `${cad(value[0])} to ${cad(value[1])}`
-                            : cad(value),
-                          name,
-                        ]}
-                      />
-                      <Area
-                        dataKey="band"
-                        name="Simulated range"
-                        stroke="none"
-                        fill="#b4cba8"
-                        fillOpacity={0.45}
-                        isAnimationActive={false}
-                      />
-                      <Line
-                        dataKey="median"
-                        name="Median cash"
-                        stroke="#284f3e"
-                        dot={false}
-                        strokeWidth={2.5}
-                        isAnimationActive={false}
-                      />
-                      <Line
-                        dataKey="scenario"
-                        name="Your what-if"
-                        stroke="#986419"
-                        dot={false}
-                        strokeDasharray="6 4"
-                        strokeWidth={2}
-                        isAnimationActive={false}
-                      />
-                    </ComposedChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="intelligence-chart-key">
-                  <span>Green: median cash</span>
-                  <span>Shaded: simulated range</span>
-                  <span>Gold: your what-if</span>
-                </div>
-                <p className="field-note">
-                  400 simulated paths. The range is exploratory, not a guaranteed confidence
-                  interval. What-if ending balance:{' '}
-                  <strong>{amount(report.summary.scenarioEndingMedian)}</strong>.
-                </p>
-              </>
-            ) : (
-              <p>
-                Enter total current cash above or connect a CAD deposit account to see balance
-                forecasts. Spending projections remain available.
-              </p>
+          <div id="outlook-content">
+            {tab === 'outlook' && (
+              <StudentSnapshot
+                report={report}
+                onWork={() => show('work')}
+                onCash={() => show('cash')}
+                onTuition={() => navigate('semester')}
+              />
             )}
-          </section>
-          <section className="intelligence-section">
-            <SectionTitle
-              title="Your tuition, with a plan"
-              subtitle="Known tuition bills are included in the cash forecast. First cash coverage can be temporary; check readiness at the deadline."
-              action={
-                <Button variant="ghost" onClick={() => navigate('semester')}>
-                  Edit saved bills
-                </Button>
-              }
-            />
-            {report.tuition.length ? (
-              <div className="intelligence-cards">
-                {report.tuition.map((bill) => (
-                  <article className="card" key={`${bill.id}-${bill.dueDate}`}>
-                    <CalendarClock size={22} />
-                    <h3>{bill.name}</h3>
-                    <p>
-                      {cad(bill.amount)} · Due {bill.dueDate}
-                    </p>
-                    <Readiness value={bill.successRate} />
-                    <dl>
-                      <Row label="Gap at deadline" value={amount(bill.gapAtDeadline)} />
-                      <Row label="Extra per week to close gap" value={amount(bill.extraPerWeek)} />
-                      <Row
-                        label="First median cash coverage"
-                        value={bill.firstCashCoverageDate || 'Not within this forecast'}
-                      />
-                      <Row
-                        label="What-if readiness"
-                        value={
-                          bill.scenarioSuccessRate === null
-                            ? 'Not enough data'
-                            : `${bill.scenarioSuccessRate}% of simulations`
-                        }
-                      />
-                    </dl>
-                    {bill.status !== 'forecast' && (
-                      <p className="field-note">
-                        {bill.status === 'beyond_horizon'
-                          ? 'Extend the horizon to include this deadline.'
-                          : 'This bill is due today or earlier. Confirm whether it has already been paid in your semester plan.'}
-                      </p>
-                    )}
-                  </article>
-                ))}
+            {tab === 'work' && <WorkSchedule asOf={report.asOf} />}
+            {tab === 'week' && (
+              <div className="forecast-stack outlook-home">
+                <WeeklyActionPlan report={report} onReview={openReview} />
+                {reviewCount > 0 && (
+                  <button
+                    type="button"
+                    className="outlook-review student-review-button"
+                    id="outlook-review"
+                    onClick={openReview}
+                  >
+                    <span>
+                      <strong>
+                        {reviewCount}{' '}
+                        {reviewCount === 1 ? 'transaction needs' : 'transactions need'} your input
+                      </strong>
+                      <small>
+                        Missing category or changed split ·{' '}
+                        {money(reviewRows.reduce((total, t) => total + Math.abs(t.cashFlow), 0))} in
+                        total
+                      </small>
+                    </span>
+                    <span className="review-link">
+                      Review <ArrowRight size={16} aria-hidden="true" />
+                    </span>
+                  </button>
+                )}
               </div>
-            ) : (
-              <p className="inline-notice">
-                Add a Tuition and School expense to your semester plan, or enter a tuition target
-                above.
-              </p>
             )}
-          </section>
-          <section className="intelligence-section">
-            <SectionTitle
-              title="Goals that share the same money"
-              subtitle="Higher-priority goals are allocated first. Existing savings stay reserved; future bills remain protected."
-              action={
-                <Button variant="ghost" onClick={() => navigate('goals')}>
-                  Manage goals
-                </Button>
-              }
-            />
-            <div className="intelligence-cards">
-              {report.goals.map((goal) => (
-                <article className="card" key={goal.id}>
-                  <Badge>{goal.priority} priority</Badge>
-                  <h3>{goal.name}</h3>
-                  <p>
-                    {cad(goal.current)} saved of {cad(goal.target)} · Target {goal.deadline}
-                  </p>
-                  <Readiness value={goal.successRate} />
-                  <dl>
-                    <Row
-                      label="Median funding date"
-                      value={goal.projectedDate || 'Beyond this forecast'}
-                    />
-                    <Row label="Projected saved amount" value={amount(goal.projectedAmount)} />
-                    <Row label="Extra monthly cash needed" value={amount(goal.extraPerMonth)} />
-                  </dl>
-                  {goal.status !== 'forecast' && (
-                    <p className="field-note">
-                      {goal.status === 'beyond_horizon'
-                        ? 'Goal deadline is beyond this forecast horizon.'
-                        : 'This goal deadline has passed. Update its target date.'}
-                    </p>
-                  )}
-                </article>
-              ))}
-            </div>
-            {!report.goals.length && (
-              <p className="inline-notice">
-                Add a savings goal to estimate its funding date and competing priorities.
-              </p>
-            )}
-          </section>
-          <ForecastInsights report={report} />
-          <section className="card intelligence-assistant">
-            <SectionTitle
-              title="Ask your forecast"
-              subtitle="Local explanations grounded in these results. This assistant does not use a generative language model."
-            />
-            <div className="intelligence-topics">
-              {report.assistant.map((item) => (
-                <Button
-                  key={item.id}
-                  variant={topic === item.id ? 'primary' : 'secondary'}
-                  onClick={() => setTopic(item.id)}
+            {tab === 'cash' && (
+              <div className="forecast-stack">
+                <div
+                  className="forecast-segment student-subnav"
+                  role="group"
+                  aria-label="Cash flow views"
                 >
-                  {item.question}
-                </Button>
-              ))}
-            </div>
-            {explanation && (
-              <div className="intelligence-answer" aria-live="polite">
-                <Sparkles size={20} />
-                <div>
-                  <h3>{explanation.question}</h3>
-                  {explanation.answers.map((text) => (
-                    <p key={text}>{text}</p>
+                  {[
+                    ['balance', 'Balance'],
+                    ['bills', 'Next two weeks'],
+                    ['accounts', 'Bank accounts'],
+                    ['prices', 'Rising prices'],
+                  ].map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      aria-pressed={cashView === id}
+                      onClick={() => setCashView(id)}
+                    >
+                      {label}
+                    </button>
                   ))}
                 </div>
+                {cashView === 'balance' && (
+                  <>
+                    <section className="card intelligence-chart">
+                      <SectionTitle
+                        title="How your balance could change"
+                        subtitle="After expected income and spending · CAD"
+                      />
+                      {report.quality.cashKnown ? (
+                        <ForecastChart
+                          data={report.timeline}
+                          events={report.upcoming}
+                          threshold={report.liquidity.protectedBalance}
+                          label="Estimated cash balance over time, in Canadian dollars."
+                        />
+                      ) : (
+                        <p>Add your current cash under “Try a change” to see this chart.</p>
+                      )}
+                    </section>
+                  </>
+                )}
+                {cashView === 'bills' && (
+                  <>
+                    <LiquidityPanel report={report.liquidity} />
+                    <CashWeekCard report={report} />
+                  </>
+                )}
+                {cashView === 'accounts' && (
+                  <>
+                    <StudentMoney />
+                    <AccountForecasts report={report} />
+                    <CashReserveCard report={report} />
+                  </>
+                )}
+                {cashView === 'prices' && <EconomyPanel report={report.economy} />}
               </div>
             )}
-          </section>
-          <div className="intelligence-cards intelligence-section">
-            <section className="card">
-              <SectionTitle
-                title="Patterns worth checking"
-                subtitle="Recurring payments inferred from timing and amounts."
-              />
-              {report.recurring.length ? (
-                report.recurring.map((item) => (
-                  <div
-                    className="intelligence-list-item"
-                    key={`${item.merchant}-${item.direction}-${item.category}`}
-                  >
-                    <div>
-                      <strong>{item.merchant}</strong>
-                      <p>
-                        {item.frequency} · Next {item.nextDate || 'outside horizon'} ·{' '}
-                        {item.observations} observations
-                      </p>
-                      <small>
-                        {item.included
-                          ? 'Included as a detected pattern'
-                          : 'Replaced by your entered plan'}
-                      </small>
-                    </div>
-                    <strong>
-                      {item.direction === 'income' ? '+' : '−'}
-                      {cad(item.amount)}
-                    </strong>
-                  </div>
-                ))
-              ) : (
-                <p>
-                  No stable recurring patterns detected yet. Add known income and bills to your
-                  semester plan.
-                </p>
-              )}
-            </section>
-            <section className="card">
-              <SectionTitle
-                title="Unusual purchases"
-                subtitle="Compared with your earlier purchases in the same category. These are review prompts, not fraud alerts."
-              />
-              {report.anomalies.length ? (
-                report.anomalies.map((item) => (
-                  <div className="intelligence-list-item" key={item.id}>
-                    <div>
-                      <strong>{item.merchant}</strong>
-                      <p>
-                        {item.date} · {item.category}
-                      </p>
-                      <small>Earlier typical purchase: {cad(item.typicalAmount)}</small>
-                    </div>
-                    <strong>{cad(item.amount)}</strong>
-                  </div>
-                ))
-              ) : (
-                <p>No qualifying unusual purchases detected. More history improves comparisons.</p>
-              )}
-            </section>
-          </div>
-          <section className="card intelligence-section">
-            <SectionTitle
-              title="Your next small steps"
-              subtitle="Suggestions tied to this forecast, for you to review."
-            />
-            {report.recommendations.map((item) => (
-              <div className="intelligence-next-step" key={item.title}>
-                <TrendingUp size={19} />
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.detail}</p>
-                </div>
+            {tab === 'goals' && <GoalTimelines report={report} />}
+            {tab === 'habits' && (
+              <div className="forecast-stack">
+                <SectionTitle title="Spending habits" />
+                <SpendingMix report={report} />
+                <BehaviorPanel report={report} onTry={tryHabit} busy={busy} />
+                <details className="outlook-expand forecast-details">
+                  <summary>Compare recent spending & upcoming bills</summary>
+                  <ForecastInsights report={report} />
+                </details>
               </div>
-            ))}
-          </section>
-          {report.creditCards && <CreditCardMatches report={report.creditCards} />}
-          <details className="card intelligence-methods">
-            <summary>How this forecast was built</summary>
-            <div className="intelligence-cards">
-              {report.models.map((model) => (
-                <article key={model.series}>
-                  <h3>{model.series}</h3>
-                  <strong>{model.selected}</strong>
-                  <p>{model.reason}</p>
-                  <p>
-                    {model.trainingWeeks} training weeks · {model.validationWeeks} validation weeks
-                  </p>
-                  <p>
-                    Mean absolute weekly holdout error:{' '}
-                    {model.mae === null ? 'Not enough history to measure' : cad(model.mae)}
-                  </p>
+            )}
+            {tab === 'cards' && (
+              <>
+                <SectionTitle
+                  title="Card options"
+                  subtitle="Rewards after fees · based on your spending"
+                />
+                <p className="field-note">
+                  Estimates assume repayment in full. Compare affordability in Cash flow.
+                </p>
+                <CreditCardMatches report={report.creditCards} />
+              </>
+            )}
+            {tab === 'details' && (
+              <div className="forecast-stack">
+                <div>
+                  <Button variant="ghost" onClick={() => show('outlook')}>
+                    <ArrowLeft size={16} aria-hidden="true" />
+                    Back to my semester
+                  </Button>
+                </div>
+                <SectionTitle
+                  title="How your outlook works"
+                  subtitle="Understand where the numbers come from, what they assume, and how much to rely on them."
+                />
+                {report.quality.warnings.length > 0 && (
+                  <details className="forecast-details card intelligence-warnings">
+                    <summary>Data & assumptions</summary>
+                    <ul>
+                      {report.quality.warnings.map((warning) => (
+                        <li key={warning}>{warning}</li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+                <ModelStatus report={report} />
+                <ForecastAccuracy report={report} />
+                <section className="card intelligence-assistant">
+                  <SectionTitle
+                    title="Your questions, explained"
+                    subtitle="Plain-language answers based on your current outlook."
+                  />
+                  <div className="intelligence-topics">
+                    {report.assistant.map((item) => (
+                      <Button
+                        key={item.id}
+                        variant={topic === item.id ? 'primary' : 'secondary'}
+                        onClick={() => setTopic(item.id)}
+                      >
+                        {item.question}
+                      </Button>
+                    ))}
+                  </div>
+                  {explanation && (
+                    <div className="intelligence-answer" aria-live="polite">
+                      <div>
+                        <h3>{explanation.question}</h3>
+                        {explanation.answers.map((text) => (
+                          <p key={text}>{text}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </section>
+                <section className="card">
+                  <SectionTitle title="How this forecast was built" />
+                  {report.models.map((model) => (
+                    <article key={model.series}>
+                      <h3>{model.series}</h3>
+                      <p>{model.reason}</p>
+                    </article>
+                  ))}
                   <ul>
-                    {model.candidates.map((candidate) => (
-                      <li key={candidate.name}>
-                        {candidate.name}:{' '}
-                        {candidate.mae === null
-                          ? 'not evaluated'
-                          : `${cad(candidate.mae)} weekly error`}
-                      </li>
+                    {report.assumptions.map((item) => (
+                      <li key={item}>{item}</li>
                     ))}
                   </ul>
-                </article>
-              ))}
-            </div>
-            <h3>Cash assumptions</h3>
-            <dl>
-              <Row label="Current cash" value={amount(report.summary.cash)} />
-              <Row label="Credit balance reserve" value={cad(report.summary.creditReserve)} />
-              <Row label="Pending outflows reserved" value={cad(report.summary.pendingReserve)} />
-              <Row
-                label="Existing goal savings protected"
-                value={cad(report.summary.goalReserve)}
-              />
-              <Row label="Minimum balance protected" value={cad(report.summary.buffer)} />
-            </dl>
-            <ul>
-              {report.assumptions.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-            <p>
-              Model version: {report.version}. Refresh after syncing transactions or changing your
-              plan.
-            </p>
-          </details>
+                  <p>
+                    Model version: {report.version}. Forecast dates refresh when you sync
+                    transactions or change your saved plan.
+                  </p>
+                </section>
+              </div>
+            )}
+          </div>
+          {tab === 'details' && (
+            <section className="card outlook-cleanup">
+              <SectionTitle title="Transaction cleanup settings" />
+              <MerchantEnrichment />
+            </section>
+          )}
+          {reviewOpen && (
+            <Modal title="Review transactions" onClose={() => setReviewOpen(false)}>
+              <QuickReview asOf={report.asOf} />
+            </Modal>
+          )}
+          <div className="outlook-footer">
+            <p>Estimates in CAD · not guaranteed</p>
+            <Button variant="ghost" onClick={() => show(tab === 'details' ? 'outlook' : 'details')}>
+              <CircleHelp size={16} aria-hidden="true" />
+              {tab === 'details' ? 'Back to my semester' : 'About these estimates'}
+            </Button>
+          </div>
         </div>
-      )}
-    </>
-  );
-}
-function Metric({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return (
-    <div className="card">
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <small>{detail}</small>
-    </div>
-  );
-}
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt>{label}</dt>
-      <dd>{value}</dd>
-    </div>
-  );
-}
-function Readiness({ value }: { value: number | null }) {
-  return (
-    <div className="intelligence-readiness">
-      {value === null ? (
-        <p>Readiness needs more history, a cash balance, and a deadline within the horizon.</p>
-      ) : (
-        <>
-          <strong>{Math.round(value)}%</strong>
-          <span>of modeled paths meet this deadline</span>
-          <Progress value={value} label="Simulated funding readiness" />
-        </>
       )}
     </div>
   );

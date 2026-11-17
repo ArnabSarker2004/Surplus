@@ -70,3 +70,14 @@ def test_acceptance_assumption_reduces_amex_rewards_without_reducing_fee():
     assert half["Groceries"] == full["Groceries"] / 2
     result = comparison(options={"cardPreferences": {"amexAcceptancePercent": 0}})
     assert next(c for c in result["cards"] if c["id"] == "cobalt")["annualNet"] == -191.88
+
+
+def test_integrated_liquidity_gate_keeps_reward_math_but_withholds_recommendation():
+    req = ForecastRequest.model_validate(payload(options={"cardPreferences": {"paidInFull": "yes"}}))
+    good = {"status": "available", "horizons": [{"firstPressureDate": None}, {"firstPressureDate": None}]}
+    baseline = compare_cards(req, good)
+    assert baseline["recommendedId"] is not None
+    for status, pressure in [("stale", None), ("insufficient", None), ("available", "2026-09-20")]:
+        current = compare_cards(req, {"status": status, "horizons": [{"firstPressureDate": None}, {"firstPressureDate": pressure}]})
+        assert current["recommendedId"] is None
+        assert current["cards"] == baseline["cards"]

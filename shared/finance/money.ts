@@ -9,7 +9,13 @@ export const cad = (n: number, cents = false) =>
     minimumFractionDigits: cents ? 2 : 0,
     maximumFractionDigits: cents ? 2 : 0,
   }).format(n);
-export const today = () => new Date().toISOString().slice(0, 10);
+export const today = () =>
+  new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Toronto',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
 export const demoToday = '2026-09-16';
 export const asOf = (w: Workspace) => (w.source === 'demo' ? demoToday : today());
 export const prettyDate = (d: string) =>

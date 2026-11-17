@@ -12,6 +12,7 @@ import {
 import { ExpenseEditor, FundingEditor } from '../components/Editors';
 import { Badge, Button, Empty, Modal, PageHead, SectionTitle } from '../components/ui';
 import { useApp } from '../lib';
+import { StudentMoney } from '../components/StudentMoney';
 
 export function SemesterPage() {
   const { w, state, save, busy, navigate, edit } = useApp();
@@ -28,7 +29,7 @@ export function SemesterPage() {
       <PageHead
         eyebrow="YOUR SEMESTER PLAN"
         title="See the whole picture."
-        description="A home for every cost, every source, and every possibility."
+        description="Plan your costs and funding. Keep loans, grants, earnings, and savings separate."
         action={
           <Button variant="secondary" onClick={edit}>
             Edit semester <CalendarDays size={16} />
@@ -62,6 +63,7 @@ export function SemesterPage() {
           opportunity applications stay outside your base plan.
         </span>
       </div>
+      <StudentMoney />
       <div className="two-col">
         <section className="card">
           <SectionTitle

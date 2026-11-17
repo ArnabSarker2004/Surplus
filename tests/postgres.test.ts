@@ -67,6 +67,15 @@ describe('PostgreSQL accounts and persistence', { skip: !process.env.DATABASE_UR
     assert.ok(saved.workspace);
     assert.ok(saved.accounts.length);
     assert.ok(saved.transactions.length);
+    assert.deepEqual(saved.workspace.cashAllocations, demoWorkspace().cashAllocations);
+    const reviewed = structuredClone(saved.workspace);
+    reviewed.cashAllocations![0].own = 825.4;
+    reviewed.cashAllocations![0].education = 3000;
+    await request(app).put('/api/workspace').set('Cookie', cookie(0)).send(reviewed).expect(200);
+    const reloaded = await new PostgresWorkspace(pool).run(ids[0], (repository) =>
+      repository.state(),
+    );
+    assert.deepEqual(reloaded.workspace?.cashAllocations, reviewed.cashAllocations);
     const other = await request(app).get('/api/state').set('Cookie', cookie(1)).expect(200);
     assert.equal(other.body.workspace, null);
     assert.equal(other.body.transactions.length, 0);

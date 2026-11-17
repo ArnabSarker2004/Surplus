@@ -41,6 +41,14 @@ export function plaidRoutes(service: PlaidService, repository: WorkspaceReposito
     await service.sync();
     res.json(repository.state());
   });
+  router.post('/trial-refresh', async (req, res) => {
+    const { kind } = z
+      .object({ kind: z.enum(['transactions', 'balance']) })
+      .strict()
+      .parse(req.body);
+    await service.trialRefresh(kind);
+    res.json(repository.state());
+  });
   router.delete('/item', async (_req, res) => {
     await service.disconnect();
     res.json(repository.state());

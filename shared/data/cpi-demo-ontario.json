@@ -1,0 +1,1064 @@
+{
+  "region": "Ontario",
+  "status": "demo",
+  "fetchedAt": "2026-09-18T19:43:57.459Z",
+  "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000401",
+  "series": [
+    {
+      "key": "all",
+      "label": "All items",
+      "vector": 41691919,
+      "points": [
+        {
+          "period": "2024-08-01",
+          "value": 163.3,
+          "releasedAt": "2024-09-17T08:30"
+        },
+        {
+          "period": "2024-09-01",
+          "value": 162.8,
+          "releasedAt": "2024-10-15T08:30"
+        },
+        {
+          "period": "2024-10-01",
+          "value": 163.5,
+          "releasedAt": "2024-11-19T08:30"
+        },
+        {
+          "period": "2024-11-01",
+          "value": 163.5,
+          "releasedAt": "2024-12-17T08:30"
+        },
+        {
+          "period": "2024-12-01",
+          "value": 162.7,
+          "releasedAt": "2025-01-21T08:30"
+        },
+        {
+          "period": "2025-01-01",
+          "value": 162.6,
+          "releasedAt": "2025-02-18T08:30"
+        },
+        {
+          "period": "2025-02-01",
+          "value": 164.6,
+          "releasedAt": "2025-03-18T08:30"
+        },
+        {
+          "period": "2025-03-01",
+          "value": 165.1,
+          "releasedAt": "2025-04-15T08:30"
+        },
+        {
+          "period": "2025-04-01",
+          "value": 164.8,
+          "releasedAt": "2025-05-20T08:30"
+        },
+        {
+          "period": "2025-05-01",
+          "value": 165.9,
+          "releasedAt": "2025-06-24T08:30"
+        },
+        {
+          "period": "2025-06-01",
+          "value": 166,
+          "releasedAt": "2025-07-15T08:30"
+        },
+        {
+          "period": "2025-07-01",
+          "value": 166.5,
+          "releasedAt": "2025-08-19T08:30"
+        },
+        {
+          "period": "2025-08-01",
+          "value": 166,
+          "releasedAt": "2025-09-16T08:30"
+        },
+        {
+          "period": "2025-09-01",
+          "value": 166.1,
+          "releasedAt": "2025-10-21T08:30"
+        },
+        {
+          "period": "2025-10-01",
+          "value": 166.4,
+          "releasedAt": "2025-11-17T08:30"
+        },
+        {
+          "period": "2025-11-01",
+          "value": 166.6,
+          "releasedAt": "2025-12-15T08:30"
+        },
+        {
+          "period": "2025-12-01",
+          "value": 166.1,
+          "releasedAt": "2026-01-19T08:30"
+        },
+        {
+          "period": "2026-01-01",
+          "value": 165.9,
+          "releasedAt": "2026-02-17T08:30"
+        },
+        {
+          "period": "2026-02-01",
+          "value": 166.7,
+          "releasedAt": "2026-03-16T08:30"
+        },
+        {
+          "period": "2026-03-01",
+          "value": 168.2,
+          "releasedAt": "2026-04-20T08:30"
+        },
+        {
+          "period": "2026-04-01",
+          "value": 168.8,
+          "releasedAt": "2026-05-19T08:30"
+        },
+        {
+          "period": "2026-05-01",
+          "value": 170.2,
+          "releasedAt": "2026-06-22T08:30"
+        },
+        {
+          "period": "2026-06-01",
+          "value": 169.3,
+          "releasedAt": "2026-07-20T08:30"
+        },
+        {
+          "period": "2026-07-01",
+          "value": 169.9,
+          "releasedAt": "2026-08-17T08:30"
+        },
+        {
+          "period": "2026-08-01",
+          "value": 170,
+          "releasedAt": "2026-09-14T08:30"
+        }
+      ]
+    },
+    {
+      "key": "groceries",
+      "label": "Food purchased from stores",
+      "vector": 41691921,
+      "points": [
+        {
+          "period": "2024-08-01",
+          "value": 190.8,
+          "releasedAt": "2024-09-17T08:30"
+        },
+        {
+          "period": "2024-09-01",
+          "value": 190.6,
+          "releasedAt": "2024-10-15T08:30"
+        },
+        {
+          "period": "2024-10-01",
+          "value": 190.9,
+          "releasedAt": "2024-11-19T08:30"
+        },
+        {
+          "period": "2024-11-01",
+          "value": 192,
+          "releasedAt": "2024-12-17T08:30"
+        },
+        {
+          "period": "2024-12-01",
+          "value": 191,
+          "releasedAt": "2025-01-21T08:30"
+        },
+        {
+          "period": "2025-01-01",
+          "value": 192.3,
+          "releasedAt": "2025-02-18T08:30"
+        },
+        {
+          "period": "2025-02-01",
+          "value": 193.3,
+          "releasedAt": "2025-03-18T08:30"
+        },
+        {
+          "period": "2025-03-01",
+          "value": 193,
+          "releasedAt": "2025-04-15T08:30"
+        },
+        {
+          "period": "2025-04-01",
+          "value": 194,
+          "releasedAt": "2025-05-20T08:30"
+        },
+        {
+          "period": "2025-05-01",
+          "value": 195.3,
+          "releasedAt": "2025-06-24T08:30"
+        },
+        {
+          "period": "2025-06-01",
+          "value": 195.7,
+          "releasedAt": "2025-07-15T08:30"
+        },
+        {
+          "period": "2025-07-01",
+          "value": 197.3,
+          "releasedAt": "2025-08-19T08:30"
+        },
+        {
+          "period": "2025-08-01",
+          "value": 196.9,
+          "releasedAt": "2025-09-16T08:30"
+        },
+        {
+          "period": "2025-09-01",
+          "value": 197.3,
+          "releasedAt": "2025-10-21T08:30"
+        },
+        {
+          "period": "2025-10-01",
+          "value": 196.4,
+          "releasedAt": "2025-11-17T08:30"
+        },
+        {
+          "period": "2025-11-01",
+          "value": 199.9,
+          "releasedAt": "2025-12-15T08:30"
+        },
+        {
+          "period": "2025-12-01",
+          "value": 200.2,
+          "releasedAt": "2026-01-19T08:30"
+        },
+        {
+          "period": "2026-01-01",
+          "value": 201.7,
+          "releasedAt": "2026-02-17T08:30"
+        },
+        {
+          "period": "2026-02-01",
+          "value": 201.2,
+          "releasedAt": "2026-03-16T08:30"
+        },
+        {
+          "period": "2026-03-01",
+          "value": 202.6,
+          "releasedAt": "2026-04-20T08:30"
+        },
+        {
+          "period": "2026-04-01",
+          "value": 201.5,
+          "releasedAt": "2026-05-19T08:30"
+        },
+        {
+          "period": "2026-05-01",
+          "value": 204.7,
+          "releasedAt": "2026-06-22T08:30"
+        },
+        {
+          "period": "2026-06-01",
+          "value": 203.5,
+          "releasedAt": "2026-07-20T08:30"
+        },
+        {
+          "period": "2026-07-01",
+          "value": 203,
+          "releasedAt": "2026-08-17T08:30"
+        },
+        {
+          "period": "2026-08-01",
+          "value": 202.3,
+          "releasedAt": "2026-09-14T08:30"
+        }
+      ]
+    },
+    {
+      "key": "dining",
+      "label": "Food purchased from restaurants",
+      "vector": 41691951,
+      "points": [
+        {
+          "period": "2024-08-01",
+          "value": 195.3,
+          "releasedAt": "2024-09-17T08:30"
+        },
+        {
+          "period": "2024-09-01",
+          "value": 195.9,
+          "releasedAt": "2024-10-15T08:30"
+        },
+        {
+          "period": "2024-10-01",
+          "value": 196.9,
+          "releasedAt": "2024-11-19T08:30"
+        },
+        {
+          "period": "2024-11-01",
+          "value": 197.3,
+          "releasedAt": "2024-12-17T08:30"
+        },
+        {
+          "period": "2024-12-01",
+          "value": 183.7,
+          "releasedAt": "2025-01-21T08:30"
+        },
+        {
+          "period": "2025-01-01",
+          "value": 175.6,
+          "releasedAt": "2025-02-18T08:30"
+        },
+        {
+          "period": "2025-02-01",
+          "value": 186.7,
+          "releasedAt": "2025-03-18T08:30"
+        },
+        {
+          "period": "2025-03-01",
+          "value": 199.4,
+          "releasedAt": "2025-04-15T08:30"
+        },
+        {
+          "period": "2025-04-01",
+          "value": 200.5,
+          "releasedAt": "2025-05-20T08:30"
+        },
+        {
+          "period": "2025-05-01",
+          "value": 201.5,
+          "releasedAt": "2025-06-24T08:30"
+        },
+        {
+          "period": "2025-06-01",
+          "value": 202.5,
+          "releasedAt": "2025-07-15T08:30"
+        },
+        {
+          "period": "2025-07-01",
+          "value": 202.9,
+          "releasedAt": "2025-08-19T08:30"
+        },
+        {
+          "period": "2025-08-01",
+          "value": 203.6,
+          "releasedAt": "2025-09-16T08:30"
+        },
+        {
+          "period": "2025-09-01",
+          "value": 204.6,
+          "releasedAt": "2025-10-21T08:30"
+        },
+        {
+          "period": "2025-10-01",
+          "value": 205.2,
+          "releasedAt": "2025-11-17T08:30"
+        },
+        {
+          "period": "2025-11-01",
+          "value": 205.4,
+          "releasedAt": "2025-12-15T08:30"
+        },
+        {
+          "period": "2025-12-01",
+          "value": 206.3,
+          "releasedAt": "2026-01-19T08:30"
+        },
+        {
+          "period": "2026-01-01",
+          "value": 206.9,
+          "releasedAt": "2026-02-17T08:30"
+        },
+        {
+          "period": "2026-02-01",
+          "value": 207.4,
+          "releasedAt": "2026-03-16T08:30"
+        },
+        {
+          "period": "2026-03-01",
+          "value": 207.8,
+          "releasedAt": "2026-04-20T08:30"
+        },
+        {
+          "period": "2026-04-01",
+          "value": 208,
+          "releasedAt": "2026-05-19T08:30"
+        },
+        {
+          "period": "2026-05-01",
+          "value": 208.5,
+          "releasedAt": "2026-06-22T08:30"
+        },
+        {
+          "period": "2026-06-01",
+          "value": 207.2,
+          "releasedAt": "2026-07-20T08:30"
+        },
+        {
+          "period": "2026-07-01",
+          "value": 208.4,
+          "releasedAt": "2026-08-17T08:30"
+        },
+        {
+          "period": "2026-08-01",
+          "value": 209.2,
+          "releasedAt": "2026-09-14T08:30"
+        }
+      ]
+    },
+    {
+      "key": "household",
+      "label": "Household operations, furnishings and equipment",
+      "vector": 41691965,
+      "points": [
+        {
+          "period": "2024-08-01",
+          "value": 134.6,
+          "releasedAt": "2024-09-17T08:30"
+        },
+        {
+          "period": "2024-09-01",
+          "value": 134.4,
+          "releasedAt": "2024-10-15T08:30"
+        },
+        {
+          "period": "2024-10-01",
+          "value": 133.9,
+          "releasedAt": "2024-11-19T08:30"
+        },
+        {
+          "period": "2024-11-01",
+          "value": 132.8,
+          "releasedAt": "2024-12-17T08:30"
+        },
+        {
+          "period": "2024-12-01",
+          "value": 131.6,
+          "releasedAt": "2025-01-21T08:30"
+        },
+        {
+          "period": "2025-01-01",
+          "value": 134.1,
+          "releasedAt": "2025-02-18T08:30"
+        },
+        {
+          "period": "2025-02-01",
+          "value": 135.4,
+          "releasedAt": "2025-03-18T08:30"
+        },
+        {
+          "period": "2025-03-01",
+          "value": 134.2,
+          "releasedAt": "2025-04-15T08:30"
+        },
+        {
+          "period": "2025-04-01",
+          "value": 135.8,
+          "releasedAt": "2025-05-20T08:30"
+        },
+        {
+          "period": "2025-05-01",
+          "value": 136.8,
+          "releasedAt": "2025-06-24T08:30"
+        },
+        {
+          "period": "2025-06-01",
+          "value": 137.5,
+          "releasedAt": "2025-07-15T08:30"
+        },
+        {
+          "period": "2025-07-01",
+          "value": 137.5,
+          "releasedAt": "2025-08-19T08:30"
+        },
+        {
+          "period": "2025-08-01",
+          "value": 137.9,
+          "releasedAt": "2025-09-16T08:30"
+        },
+        {
+          "period": "2025-09-01",
+          "value": 138.4,
+          "releasedAt": "2025-10-21T08:30"
+        },
+        {
+          "period": "2025-10-01",
+          "value": 138.7,
+          "releasedAt": "2025-11-17T08:30"
+        },
+        {
+          "period": "2025-11-01",
+          "value": 138.7,
+          "releasedAt": "2025-12-15T08:30"
+        },
+        {
+          "period": "2025-12-01",
+          "value": 136.3,
+          "releasedAt": "2026-01-19T08:30"
+        },
+        {
+          "period": "2026-01-01",
+          "value": 136.7,
+          "releasedAt": "2026-02-17T08:30"
+        },
+        {
+          "period": "2026-02-01",
+          "value": 136.1,
+          "releasedAt": "2026-03-16T08:30"
+        },
+        {
+          "period": "2026-03-01",
+          "value": 134.5,
+          "releasedAt": "2026-04-20T08:30"
+        },
+        {
+          "period": "2026-04-01",
+          "value": 135.9,
+          "releasedAt": "2026-05-19T08:30"
+        },
+        {
+          "period": "2026-05-01",
+          "value": 136,
+          "releasedAt": "2026-06-22T08:30"
+        },
+        {
+          "period": "2026-06-01",
+          "value": 135.5,
+          "releasedAt": "2026-07-20T08:30"
+        },
+        {
+          "period": "2026-07-01",
+          "value": 136.4,
+          "releasedAt": "2026-08-17T08:30"
+        },
+        {
+          "period": "2026-08-01",
+          "value": 137,
+          "releasedAt": "2026-09-14T08:30"
+        }
+      ]
+    },
+    {
+      "key": "clothing",
+      "label": "Clothing and footwear",
+      "vector": 41691980,
+      "points": [
+        {
+          "period": "2024-08-01",
+          "value": 91.4,
+          "releasedAt": "2024-09-17T08:30"
+        },
+        {
+          "period": "2024-09-01",
+          "value": 91.4,
+          "releasedAt": "2024-10-15T08:30"
+        },
+        {
+          "period": "2024-10-01",
+          "value": 93.3,
+          "releasedAt": "2024-11-19T08:30"
+        },
+        {
+          "period": "2024-11-01",
+          "value": 92.8,
+          "releasedAt": "2024-12-17T08:30"
+        },
+        {
+          "period": "2024-12-01",
+          "value": 90.4,
+          "releasedAt": "2025-01-21T08:30"
+        },
+        {
+          "period": "2025-01-01",
+          "value": 90.6,
+          "releasedAt": "2025-02-18T08:30"
+        },
+        {
+          "period": "2025-02-01",
+          "value": 92,
+          "releasedAt": "2025-03-18T08:30"
+        },
+        {
+          "period": "2025-03-01",
+          "value": 93.2,
+          "releasedAt": "2025-04-15T08:30"
+        },
+        {
+          "period": "2025-04-01",
+          "value": 93.1,
+          "releasedAt": "2025-05-20T08:30"
+        },
+        {
+          "period": "2025-05-01",
+          "value": 94.6,
+          "releasedAt": "2025-06-24T08:30"
+        },
+        {
+          "period": "2025-06-01",
+          "value": 94,
+          "releasedAt": "2025-07-15T08:30"
+        },
+        {
+          "period": "2025-07-01",
+          "value": 92.2,
+          "releasedAt": "2025-08-19T08:30"
+        },
+        {
+          "period": "2025-08-01",
+          "value": 91.9,
+          "releasedAt": "2025-09-16T08:30"
+        },
+        {
+          "period": "2025-09-01",
+          "value": 91.1,
+          "releasedAt": "2025-10-21T08:30"
+        },
+        {
+          "period": "2025-10-01",
+          "value": 92.5,
+          "releasedAt": "2025-11-17T08:30"
+        },
+        {
+          "period": "2025-11-01",
+          "value": 93.6,
+          "releasedAt": "2025-12-15T08:30"
+        },
+        {
+          "period": "2025-12-01",
+          "value": 91.4,
+          "releasedAt": "2026-01-19T08:30"
+        },
+        {
+          "period": "2026-01-01",
+          "value": 91.3,
+          "releasedAt": "2026-02-17T08:30"
+        },
+        {
+          "period": "2026-02-01",
+          "value": 92.7,
+          "releasedAt": "2026-03-16T08:30"
+        },
+        {
+          "period": "2026-03-01",
+          "value": 92.4,
+          "releasedAt": "2026-04-20T08:30"
+        },
+        {
+          "period": "2026-04-01",
+          "value": 95.1,
+          "releasedAt": "2026-05-19T08:30"
+        },
+        {
+          "period": "2026-05-01",
+          "value": 95.7,
+          "releasedAt": "2026-06-22T08:30"
+        },
+        {
+          "period": "2026-06-01",
+          "value": 94.5,
+          "releasedAt": "2026-07-20T08:30"
+        },
+        {
+          "period": "2026-07-01",
+          "value": 94.2,
+          "releasedAt": "2026-08-17T08:30"
+        },
+        {
+          "period": "2026-08-01",
+          "value": 93.6,
+          "releasedAt": "2026-09-14T08:30"
+        }
+      ]
+    },
+    {
+      "key": "transit",
+      "label": "Public transportation",
+      "vector": 41691999,
+      "points": [
+        {
+          "period": "2024-08-01",
+          "value": 189.4,
+          "releasedAt": "2024-09-17T08:30"
+        },
+        {
+          "period": "2024-09-01",
+          "value": 170.8,
+          "releasedAt": "2024-10-15T08:30"
+        },
+        {
+          "period": "2024-10-01",
+          "value": 170.7,
+          "releasedAt": "2024-11-19T08:30"
+        },
+        {
+          "period": "2024-11-01",
+          "value": 169.6,
+          "releasedAt": "2024-12-17T08:30"
+        },
+        {
+          "period": "2024-12-01",
+          "value": 200.1,
+          "releasedAt": "2025-01-21T08:30"
+        },
+        {
+          "period": "2025-01-01",
+          "value": 168.9,
+          "releasedAt": "2025-02-18T08:30"
+        },
+        {
+          "period": "2025-02-01",
+          "value": 173.3,
+          "releasedAt": "2025-03-18T08:30"
+        },
+        {
+          "period": "2025-03-01",
+          "value": 174.1,
+          "releasedAt": "2025-04-15T08:30"
+        },
+        {
+          "period": "2025-04-01",
+          "value": 174.9,
+          "releasedAt": "2025-05-20T08:30"
+        },
+        {
+          "period": "2025-05-01",
+          "value": 174,
+          "releasedAt": "2025-06-24T08:30"
+        },
+        {
+          "period": "2025-06-01",
+          "value": 180,
+          "releasedAt": "2025-07-15T08:30"
+        },
+        {
+          "period": "2025-07-01",
+          "value": 188,
+          "releasedAt": "2025-08-19T08:30"
+        },
+        {
+          "period": "2025-08-01",
+          "value": 181.4,
+          "releasedAt": "2025-09-16T08:30"
+        },
+        {
+          "period": "2025-09-01",
+          "value": 166.6,
+          "releasedAt": "2025-10-21T08:30"
+        },
+        {
+          "period": "2025-10-01",
+          "value": 167.2,
+          "releasedAt": "2025-11-17T08:30"
+        },
+        {
+          "period": "2025-11-01",
+          "value": 166.3,
+          "releasedAt": "2025-12-15T08:30"
+        },
+        {
+          "period": "2025-12-01",
+          "value": 199.1,
+          "releasedAt": "2026-01-19T08:30"
+        },
+        {
+          "period": "2026-01-01",
+          "value": 168.9,
+          "releasedAt": "2026-02-17T08:30"
+        },
+        {
+          "period": "2026-02-01",
+          "value": 174.4,
+          "releasedAt": "2026-03-16T08:30"
+        },
+        {
+          "period": "2026-03-01",
+          "value": 178.1,
+          "releasedAt": "2026-04-20T08:30"
+        },
+        {
+          "period": "2026-04-01",
+          "value": 174,
+          "releasedAt": "2026-05-19T08:30"
+        },
+        {
+          "period": "2026-05-01",
+          "value": 182.5,
+          "releasedAt": "2026-06-22T08:30"
+        },
+        {
+          "period": "2026-06-01",
+          "value": 191.5,
+          "releasedAt": "2026-07-20T08:30"
+        },
+        {
+          "period": "2026-07-01",
+          "value": 201,
+          "releasedAt": "2026-08-17T08:30"
+        },
+        {
+          "period": "2026-08-01",
+          "value": 197,
+          "releasedAt": "2026-09-14T08:30"
+        }
+      ]
+    },
+    {
+      "key": "health",
+      "label": "Health and personal care",
+      "vector": 41692004,
+      "points": [
+        {
+          "period": "2024-08-01",
+          "value": 153.3,
+          "releasedAt": "2024-09-17T08:30"
+        },
+        {
+          "period": "2024-09-01",
+          "value": 154.7,
+          "releasedAt": "2024-10-15T08:30"
+        },
+        {
+          "period": "2024-10-01",
+          "value": 155,
+          "releasedAt": "2024-11-19T08:30"
+        },
+        {
+          "period": "2024-11-01",
+          "value": 153.7,
+          "releasedAt": "2024-12-17T08:30"
+        },
+        {
+          "period": "2024-12-01",
+          "value": 153.8,
+          "releasedAt": "2025-01-21T08:30"
+        },
+        {
+          "period": "2025-01-01",
+          "value": 153.8,
+          "releasedAt": "2025-02-18T08:30"
+        },
+        {
+          "period": "2025-02-01",
+          "value": 154.4,
+          "releasedAt": "2025-03-18T08:30"
+        },
+        {
+          "period": "2025-03-01",
+          "value": 154.6,
+          "releasedAt": "2025-04-15T08:30"
+        },
+        {
+          "period": "2025-04-01",
+          "value": 154.9,
+          "releasedAt": "2025-05-20T08:30"
+        },
+        {
+          "period": "2025-05-01",
+          "value": 156.3,
+          "releasedAt": "2025-06-24T08:30"
+        },
+        {
+          "period": "2025-06-01",
+          "value": 157.1,
+          "releasedAt": "2025-07-15T08:30"
+        },
+        {
+          "period": "2025-07-01",
+          "value": 156.8,
+          "releasedAt": "2025-08-19T08:30"
+        },
+        {
+          "period": "2025-08-01",
+          "value": 157.2,
+          "releasedAt": "2025-09-16T08:30"
+        },
+        {
+          "period": "2025-09-01",
+          "value": 157.9,
+          "releasedAt": "2025-10-21T08:30"
+        },
+        {
+          "period": "2025-10-01",
+          "value": 157.4,
+          "releasedAt": "2025-11-17T08:30"
+        },
+        {
+          "period": "2025-11-01",
+          "value": 157.6,
+          "releasedAt": "2025-12-15T08:30"
+        },
+        {
+          "period": "2025-12-01",
+          "value": 157.8,
+          "releasedAt": "2026-01-19T08:30"
+        },
+        {
+          "period": "2026-01-01",
+          "value": 158,
+          "releasedAt": "2026-02-17T08:30"
+        },
+        {
+          "period": "2026-02-01",
+          "value": 158.4,
+          "releasedAt": "2026-03-16T08:30"
+        },
+        {
+          "period": "2026-03-01",
+          "value": 158.5,
+          "releasedAt": "2026-04-20T08:30"
+        },
+        {
+          "period": "2026-04-01",
+          "value": 159.3,
+          "releasedAt": "2026-05-19T08:30"
+        },
+        {
+          "period": "2026-05-01",
+          "value": 159.9,
+          "releasedAt": "2026-06-22T08:30"
+        },
+        {
+          "period": "2026-06-01",
+          "value": 159.9,
+          "releasedAt": "2026-07-20T08:30"
+        },
+        {
+          "period": "2026-07-01",
+          "value": 159.8,
+          "releasedAt": "2026-08-17T08:30"
+        },
+        {
+          "period": "2026-08-01",
+          "value": 160.3,
+          "releasedAt": "2026-09-14T08:30"
+        }
+      ]
+    },
+    {
+      "key": "recreation",
+      "label": "Recreation, education and reading",
+      "vector": 41692014,
+      "points": [
+        {
+          "period": "2024-08-01",
+          "value": 127,
+          "releasedAt": "2024-09-17T08:30"
+        },
+        {
+          "period": "2024-09-01",
+          "value": 126.8,
+          "releasedAt": "2024-10-15T08:30"
+        },
+        {
+          "period": "2024-10-01",
+          "value": 127.7,
+          "releasedAt": "2024-11-19T08:30"
+        },
+        {
+          "period": "2024-11-01",
+          "value": 127.2,
+          "releasedAt": "2024-12-17T08:30"
+        },
+        {
+          "period": "2024-12-01",
+          "value": 125.1,
+          "releasedAt": "2025-01-21T08:30"
+        },
+        {
+          "period": "2025-01-01",
+          "value": 124.4,
+          "releasedAt": "2025-02-18T08:30"
+        },
+        {
+          "period": "2025-02-01",
+          "value": 130.4,
+          "releasedAt": "2025-03-18T08:30"
+        },
+        {
+          "period": "2025-03-01",
+          "value": 128.7,
+          "releasedAt": "2025-04-15T08:30"
+        },
+        {
+          "period": "2025-04-01",
+          "value": 128.6,
+          "releasedAt": "2025-05-20T08:30"
+        },
+        {
+          "period": "2025-05-01",
+          "value": 132.2,
+          "releasedAt": "2025-06-24T08:30"
+        },
+        {
+          "period": "2025-06-01",
+          "value": 129.8,
+          "releasedAt": "2025-07-15T08:30"
+        },
+        {
+          "period": "2025-07-01",
+          "value": 130.6,
+          "releasedAt": "2025-08-19T08:30"
+        },
+        {
+          "period": "2025-08-01",
+          "value": 128.4,
+          "releasedAt": "2025-09-16T08:30"
+        },
+        {
+          "period": "2025-09-01",
+          "value": 129.8,
+          "releasedAt": "2025-10-21T08:30"
+        },
+        {
+          "period": "2025-10-01",
+          "value": 130.7,
+          "releasedAt": "2025-11-17T08:30"
+        },
+        {
+          "period": "2025-11-01",
+          "value": 127.7,
+          "releasedAt": "2025-12-15T08:30"
+        },
+        {
+          "period": "2025-12-01",
+          "value": 126.6,
+          "releasedAt": "2026-01-19T08:30"
+        },
+        {
+          "period": "2026-01-01",
+          "value": 126.9,
+          "releasedAt": "2026-02-17T08:30"
+        },
+        {
+          "period": "2026-02-01",
+          "value": 130.8,
+          "releasedAt": "2026-03-16T08:30"
+        },
+        {
+          "period": "2026-03-01",
+          "value": 133.4,
+          "releasedAt": "2026-04-20T08:30"
+        },
+        {
+          "period": "2026-04-01",
+          "value": 130.2,
+          "releasedAt": "2026-05-19T08:30"
+        },
+        {
+          "period": "2026-05-01",
+          "value": 133.4,
+          "releasedAt": "2026-06-22T08:30"
+        },
+        {
+          "period": "2026-06-01",
+          "value": 133.4,
+          "releasedAt": "2026-07-20T08:30"
+        },
+        {
+          "period": "2026-07-01",
+          "value": 134.5,
+          "releasedAt": "2026-08-17T08:30"
+        },
+        {
+          "period": "2026-08-01",
+          "value": 134.6,
+          "releasedAt": "2026-09-14T08:30"
+        }
+      ]
+    }
+  ]
+}

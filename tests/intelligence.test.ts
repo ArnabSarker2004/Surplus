@@ -74,7 +74,57 @@ describe('Private intelligence gateway', () => {
     );
     assert.ok(payload.transactions.every((t) => t.source === 'demo'));
     assert.ok(payload.accounts.every((a) => a.source === 'demo'));
+    assert.equal(payload.savingsEligibleCash, 0);
     assert.equal(JSON.stringify(payload).includes('access_token'), false);
+  });
+  it('uses unflagged bank cash as personal while keeping what-if cash out of goal forecasts', () => {
+    const state = {
+      workspace: demoWorkspace(),
+      accounts: demoAccounts,
+      transactions: [],
+      rules: [],
+      opportunities: [],
+    };
+    assert.equal(
+      forecastPayload(state, { ...defaultForecastOptions, openingCash: 9000 }).savingsEligibleCash,
+      0,
+    );
+    delete state.workspace.cashAllocations;
+    assert.equal(forecastPayload(state, defaultForecastOptions).savingsEligibleCash, 6075.4);
+  });
+  it('persists work terms and sends their pay boundaries to the forecast', async () => {
+    const workspace = demoWorkspace();
+    workspace.workScheduleConfirmed = true;
+    workspace.funding = [
+      {
+        id: 'coop',
+        name: 'Winter co-op',
+        type: 'Earned',
+        status: 'Expected',
+        amount: 1600,
+        frequency: 'Biweekly',
+        date: '2027-01-15',
+        endDate: '2027-05-07',
+        workKind: 'Co-op',
+        workStart: '2027-01-04',
+        workEnd: '2027-04-30',
+      },
+    ];
+    await agent.put('/api/workspace').send(workspace).expect(200);
+    const state = (await agent.get('/api/state')).body;
+    assert.equal(state.workspace.workScheduleConfirmed, true);
+    assert.deepEqual(state.workspace.funding, workspace.funding);
+    const payload = forecastPayload(state, defaultForecastOptions);
+    assert.equal(payload.workScheduleConfirmed, true);
+    assert.equal(payload.funding[0].workEnd, '2027-04-30');
+    assert.equal(payload.funding[0].endDate, '2027-05-07');
+    assert.equal(payload.semester.end, workspace.semester.end);
+    await agent
+      .put('/api/workspace')
+      .send({ ...workspace, funding: [{ ...workspace.funding[0], endDate: '2027-01-01' }] })
+      .expect(400);
+    assert.deepEqual((await agent.get('/api/state')).body.workspace.funding, workspace.funding);
+    await agent.post('/api/demo').send({}).expect(200);
   });
   it('fails gracefully without exposing internal errors or changing saved data', async () => {
     global.fetch = async () => {
@@ -83,5 +133,29 @@ describe('Private intelligence gateway', () => {
     const result = await agent.post('/api/intelligence/forecast').send({}).expect(503);
     assert.ok(!JSON.stringify(result.body).includes('sensitive-internal-detail'));
     assert.equal((await agent.get('/api/state')).body.workspace.source, 'demo');
+  });
+  it('requires authentication and validates routine-purchase corrections', async () => {
+    const state = (await agent.get('/api/state')).body;
+    const item = state.transactions[0];
+    await request(app)
+      .patch(`/api/intelligence/habits/${item.id}`)
+      .send({ treatment: 'routine' })
+      .expect(401);
+    await agent
+      .patch(`/api/intelligence/habits/${item.id}`)
+      .send({ treatment: 'anything' })
+      .expect(400);
+    await agent
+      .patch('/api/intelligence/habits/missing')
+      .send({ treatment: 'routine' })
+      .expect(404);
+    const updated = await agent
+      .patch(`/api/intelligence/habits/${item.id}`)
+      .send({ treatment: 'routine' })
+      .expect(200);
+    assert.deepEqual(
+      updated.body.transactions.find((t: { id: string }) => t.id === item.id),
+      { ...item, habitTreatment: 'routine' },
+    );
   });
 });

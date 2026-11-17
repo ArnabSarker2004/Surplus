@@ -18,6 +18,9 @@ export interface PlaidItem {
   id: string;
   encryptedToken: string;
   cursor: string;
+  transactionMetadataVersion?: number;
+  lastRefreshRequestedAt?: string;
+  lastAutoAttemptAt?: string;
   syncedAt: string | null;
   status: 'connected' | 'ready' | 'error';
   error: string | null;
@@ -122,11 +125,14 @@ export function applySync(
   source: Transaction['source'] = 'sandbox',
 ) {
   const items = new Map(existing.map((t) => [t.id, t]));
+  const original = new Map(existing.filter((t) => t.source === source).map((t) => [t.id, t]));
   for (const page of pages) {
     for (const t of [...page.added, ...page.modified]) {
       const previous =
         items.get(t.transaction_id) ??
-        (t.pending_transaction_id ? items.get(t.pending_transaction_id) : undefined);
+        (t.pending_transaction_id
+          ? (items.get(t.pending_transaction_id) ?? original.get(t.pending_transaction_id))
+          : undefined);
       if (t.pending_transaction_id) items.delete(t.pending_transaction_id);
       items.set(t.transaction_id, normalize(t, rules, previous, source));
     }
@@ -139,14 +145,15 @@ interface RawAccount {
   name: string;
   type: string;
   subtype: string | null;
-  balances: { current: number | null; iso_currency_code: string | null };
+  balances: { current: number | null; available?: number | null; iso_currency_code: string | null };
 }
 export async function plaidAccounts(
   token: string,
   environment: PlaidEnvironment = 'sandbox',
+  fresh = false,
 ): Promise<Account[]> {
   const response = await plaidRequest<{ accounts: RawAccount[] }>(
-    '/accounts/get',
+    fresh ? '/accounts/balance/get' : '/accounts/get',
     {
       access_token: token,
     },
@@ -160,6 +167,9 @@ export async function plaidAccounts(
       : 'other',
     subtype: a.subtype ?? '',
     balance: a.balances.current ?? 0,
+    balanceKnown: a.balances.current !== null,
+    available: a.balances.available ?? null,
+    balanceObservedAt: new Date().toISOString(),
     currency: a.balances.iso_currency_code ?? 'UNKNOWN',
     source: bankSource(environment),
   }));

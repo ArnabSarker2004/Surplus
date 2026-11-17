@@ -47,7 +47,7 @@ def estimate(card_id, monthly, preferences):
     return rewards, chosen
 
 
-def compare_cards(request: ForecastRequest):
+def compare_cards(request: ForecastRequest, liquidity=None):
     now, pref = request.asOf, request.options.cardPreferences
     cutoff = now - timedelta(days=89)
     observed = [t for t in request.transactions if cutoff <= t.date <= now and t.currency == "CAD" and not t.pending]
@@ -89,7 +89,10 @@ def compare_cards(request: ForecastRequest):
         warnings.insert(0, "Less than 90 days of history: this is an early spending-based estimate.")
     if stale:
         warnings.insert(0, "Catalogue review is over 90 days old. Rankings are paused until issuer terms are reviewed.")
+    liquidity_caution = liquidity is not None and (liquidity["status"] != "available" or liquidity["horizons"][1]["firstPressureDate"] is not None)
+    if liquidity_caution:
+        warnings.insert(0, "No card is recommended while the near-term median cash path is below your protected balance, or liquidity data is insufficient or stale. Reward calculations remain available for comparison; they do not establish affordability.")
     return dict(reviewedAt=REVIEWED, stale=stale, observedDays=days, enoughHistory=enough,
                 monthlyEligibleSpend=round(sum(monthly.values()), 2), excludedOutflows=round(excluded, 2),
                 paidInFull=pref.paidInFull, warnings=warnings, cards=rows,
-                recommendedId=rows[0]["id"] if enough and not stale and pref.paidInFull == "yes" else None)
+                recommendedId=rows[0]["id"] if enough and not stale and not liquidity_caution and pref.paidInFull == "yes" else None)
